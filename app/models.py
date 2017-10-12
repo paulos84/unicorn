@@ -28,6 +28,7 @@ class Reactant(db.Model):
     name = db.Column(db.String(50), nullable=False)
     batch = db.Column(db.String(50))
     amount = db.Column(db.Float(20), nullable=False)
+    experiment = db.relationship('Experiment', backref='owner', lazy='dynamic')
     #e.g. first instance = lactose, bn ...., amount=280g
     ##    2nd instance   = water, (null), amount - 170g
     ## views - concentration - calculate from amounts
