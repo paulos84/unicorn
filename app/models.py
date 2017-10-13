@@ -6,6 +6,7 @@ db = SQLAlchemy()
 
 class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), unique=True)
     aim = db.Column(db.String(300))
     results_loc =  db.Column(db.String(300))
     summary = db.Column(db.String(500))
