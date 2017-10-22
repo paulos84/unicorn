@@ -6,8 +6,7 @@ experiment = Blueprint('experiment', __name__)
 
 @experiment.route('/')
 def experiment():
-    exp = Experiment.query.first()
-    return jsonify ('number'=exp.id)
+    return jsonify([a.aim for a in Experiment.query.first()])
 
 
 

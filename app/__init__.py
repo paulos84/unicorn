@@ -8,6 +8,8 @@ def create_app():
     from .api import experiment
     app.register_blueprint(experiment)
     db.init_app(app)
+    mgr = APIManager(app, flask_sqlalchemy_db=db)
+    mgr.create_api(app, methods=['GET'])
     with app.app_context():
         return app
 
