@@ -1,14 +1,12 @@
 from flask import Flask
 from app.models import db
-
+from flask_restless import APIManager
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object('config.DevelopmentConfig')
-    #from .views.hourly_data import hourly_data
-    #from .views.sites_info import sites_info
-    #app.register_blueprint(hourly_data)
-    #app.register_blueprint(sites_info)
+    from .api import experiment
+    app.register_blueprint(experiment)
     db.init_app(app)
     with app.app_context():
         return app
