@@ -4,14 +4,12 @@ from app import create_app
 from flask import Blueprint
 
 
+experiment = Blueprint('experiment', __name__)
 
-hourly_data = Blueprint('experiment', __name__)
+@experiment.route('/')
+def hourly_data_1(pollutant, name):
+    return 'test'
 
 
 
-
-
-manager = APIManager(create_app(), flask_sqlalchemy_db=db)
-
-manager.create_api(Experiment, methods=['GET', 'POST', 'DELETE'])
 
