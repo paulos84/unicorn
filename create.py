@@ -2,7 +2,8 @@ from flask import request, jsonify, Blueprint, render_template
 from api import db, Experiment, Conditions
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, FloatField
-
+import requests
+import json
 
 exp_create = Blueprint('create_experiment', __name__)
 
@@ -38,6 +39,21 @@ def product_form():
     if form.validate_on_submit():
         return 'The username is {}. The password is {}'.format (form.username.data, form.password.data)
     return render_template('form.html', form=form)
+
+
+
+payload = { 
+    'title': "The Eye of the World",
+    'author': {
+        'first_name': "Robert",
+        'last_name': "Jordan"
+        },  
+    'is_available': True
+}
+headers = {'content-type': 'application/json'}
+r = requests.post("http://localhost:5000/api/book", data=json.dumps(payload),headers=headers)
+
+
 
 """
 class LoginForm(FlaskForm):
