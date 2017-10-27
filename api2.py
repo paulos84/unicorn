@@ -65,14 +65,17 @@ def create_exp():
     misc = request.form.get('misc')
     if exp_form.validate_on_submit():
         #return 'success {}'.format(name)
-        form_data = {a: b for a, b in request.form.items() if b != '' and a != 'csrf_token'}
+        form_data = {a: b for a, b in request.form.items() if a != 'csrf_token' and b != ''}
+        exp_data = {key: form_data[key] for key in ('name', 'notes', 'dp3', 'graph_loc')}
         return redirect(url_for('new_conditions', form_data=form_data))
     return render_template('exp_form.html', form=exp_form)
 
 
 @app.route('/post/<form_data>')
 def new_conditions(form_data):
-    return form_data
+    payload
+
+    #return jsonify(form_data)
 
 
 migrate = Migrate(app, db)
