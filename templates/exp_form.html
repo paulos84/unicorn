@@ -4,7 +4,7 @@
 <title>Create Experiment</title>
 </head>
 <body>
-	<form method="POST" action="{{url_for('create_experiment.create_exp') }}">
+	<form method="POST" action="{{url_for('create_exp') }}">
 	    {{ form.csrf_token }}
 	    {{ render_field(form.name) }}
 	    <ul>
