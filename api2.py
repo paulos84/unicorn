@@ -65,7 +65,7 @@ def create_exp():
     misc = request.form.get('misc')
     if exp_form.validate_on_submit():
         #return 'success {}'.format(name)
-        form_data = {a: b for a, b in request.form.items() if b is not None}
+        form_data = {a: b for a, b in request.form.items() if b != '' and a != 'csrf_token'}
         return redirect(url_for('new_conditions', form_data=form_data))
     return render_template('exp_form.html', form=exp_form)
 
