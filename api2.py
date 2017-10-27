@@ -64,18 +64,18 @@ def create_exp():
     enz_dose = request.form.get('enz_dose')
     misc = request.form.get('misc')
     if exp_form.validate_on_submit():
-        #return 'success {}'.format(name)
         form_data = {a: b for a, b in request.form.items() if a != 'csrf_token' and b != ''}
-        exp_data = {key: form_data[key] for key in ('name', 'notes', 'dp3', 'graph_loc')}
-        return redirect(url_for('new_conditions', form_data=form_data))
+        exp_data = {key: form_data[key] for key in form_data if key in ('name', 'notes', 'dp3', 'graph_loc')}
+        conditions = {key: form_data[key] for key in form_data if key in ('temp', 'enz_dose', 'misc')}
+        return redirect(url_for('new_conditions', form_data=conditions))
     return render_template('exp_form.html', form=exp_form)
 
 
 @app.route('/post/<form_data>')
 def new_conditions(form_data):
-    payload
 
-    #return jsonify(form_data)
+
+    return jsonify(form_data)
 
 
 migrate = Migrate(app, db)
