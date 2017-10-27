@@ -68,8 +68,15 @@ def create_exp():
         if [temp, enz_dose, misc] == [qs.temp, qs.enz_dose, qs.misc]:
             conditions_id = qs.id
             return redirect(repeat_conditions(conditions_id, request))
-        redirect(process_form_data(), code=302)
+        return redirect(new_conditions(request)
     return render_template('exp_form.html', form=exp_form)
+
+
+
+>>>po = {'sop': 4, 're': 7, 'pl': None}
+>>>ay = {a:b for a,b in po.items() if b is not None}
+>>>ay
+{'re': 7, 'sop': 4}
 
 
 @app.route('/api/experiment', methods=['POST'])
@@ -80,11 +87,23 @@ def repeat_conditions(conditions_id, request):
 or
 
 @app.route('/api/'experiment, methods=['POST'])
-def new_conditions(conditions_id, request):
-    json_dict
+def new_conditions(request):
+    payload = {
+    "conditions": {
+    "enz_dose": 17.0,
+    "misc": null,
+    "temp": 69.0
+    },
+    "dp3": 27.0,
+    "gos": 38.0,
+    "graph_loc": null,
+    "name": "exp125",
+    "notes": "second"
+    }
     return jsonify(...)
 
 requests.post()
+"""
 
 
 
