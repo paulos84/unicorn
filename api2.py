@@ -59,14 +59,14 @@ def create_exp():
         enz_dose = request.form.get('enz_dose')
         misc = request.form.get('misc')
         form_data = {a: b for a, b in request.form.items() if a != 'csrf_token' and b != ''}
-        exp_data = {key: form_data[key] for key in form_data if key in ('name', 'notes', 'dp3', 'graph_loc')}
+        exp_data = {key: form_data[key] for key in form_data if key in ('name', 'notes', 'dp3', 'gos', 'graph_loc')}
         conditions = {key: form_data[key] for key in form_data if key in ('temp', 'enz_dose', 'misc')}
         url = 'http://127.0.0.1:8080/api/experiment'
         qs = Conditions.query.first()
-        #could remove above 3 var assignments by just e.g. [conditions['temp'], conditions['enz_dose'], conditions['misc']]
         if [temp, enz_dose, misc] == [qs.temp, qs.enz_dose, qs.misc] or [qs.temp, qs.enz_dose]:
-            return qs.id
-
+            exp_data['conditions'] = {'id':qs.id}
+            requests.post(url, json=exp_data)
+            return jsonify(exp_data)
 
 
         # if conditional:
