@@ -67,7 +67,13 @@ def create_exp():
         qs = Conditions.query.all()
         if [temp, enz_dose, misc] == [qs.temp, qs.enz_dose, qs.misc]:
             conditions_id = qs.id
-            return redirect(repeat_conditions(conditions_id, request))
+            var = (sdf)
+            db.session.add(var)
+            db.session.commit()
+            new_dict =
+            return redirect(repeat_conditions(new_dict))
+        sdfgfd =
+        bdf =
         return redirect(new_conditions(request)
     return render_template('exp_form.html', form=exp_form)
 

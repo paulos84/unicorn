@@ -9,7 +9,6 @@ import requests
 import json
 
 
-
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
 db = SQLAlchemy(app)
@@ -52,29 +51,47 @@ class ExperimentForm(FlaskForm):
     misc = StringField('Graph location', validators=[Length(max=500, message='Max 500 characters')])
 
 
-@app.route('/create', methods=['GET', 'POST'])
+@app.route('/api/create', methods=['GET', 'POST'])
 def create_exp():
     exp_form = ExperimentForm()
-    name = request.form.get('name')
-    notes = request.form.get('notes')
-    dp3 = request.form.get('dp3')
-    gos = request.form.get('gos')
-    graph_loc = request.form.get('graph_loc')
-    temp = request.form.get('temp')
-    enz_dose = request.form.get('enz_dose')
-    misc = request.form.get('misc')
     if exp_form.validate_on_submit():
+
         form_data = {a: b for a, b in request.form.items() if a != 'csrf_token' and b != ''}
         exp_data = {key: form_data[key] for key in form_data if key in ('name', 'notes', 'dp3', 'graph_loc')}
         conditions = {key: form_data[key] for key in form_data if key in ('temp', 'enz_dose', 'misc')}
-        return redirect(url_for('new_conditions', form_data=conditions))
+
+
+        # if conditional:
+        exp_data['conditions'] = conditions
+        ere = json.dumps(exp_data)
+        foo = {
+              'conditions': {'id':1},
+              'dp3': 18,
+              'gos': 152.5,
+
+              'name': 'yyui',
+              'notes': 'f1h'
+            }
+
+        url = 'http://127.0.0.1:8080/api/experiment'
+
+        requests.post(url, json=foo, headers={'content-type': 'application/json'})
+        return json.dumps(exp_data)
+        #return redirect(url_for('new_conditions', payload=foo))
     return render_template('exp_form.html', form=exp_form)
 
 
-@app.route('/post/<form_data>')
-def new_conditions(form_data):
+@app.route('/api/update/<payload>')
+def new_conditions(payload):
+    headers = {'content-type': 'application/json'}
+    url = 'http://127.0.0.1:8080/api/experiment'
+    r = requests.post(url, data=payload, headers=headers)
+
+    return jsonify(payload)
 
 
+@app.route('/api/update/<form_data>')
+def repeat_conditions(form_data):
     return jsonify(form_data)
 
 
@@ -84,7 +101,7 @@ db_manager.add_command('db', MigrateCommand)
 
 
 if __name__ == '__main__':
-    app.run(port=8080)
+    app.run(port=8080, threaded=True)
 
 
 
