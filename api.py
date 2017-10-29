@@ -37,7 +37,7 @@ class Results(db.Model):
     dp2 = db.Column(db.Float(20))
     glu = db.Column(db.Float(20))
     gal = db.Column(db.Float(20))
-    exp = db.relationship('Experiment', backref='results', lazy='dynamic')
+    exp = db.relationship('Results', backref='results', lazy='dynamic')
 
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
@@ -50,12 +50,13 @@ class ExperimentForm(FlaskForm):
     name = StringField('Experiment name', validators=[InputRequired('Experiment name is required'),
                                                       Length(max=50, message='Max 50 characters')])
     notes = StringField('Notes on aim, summary etc.', validators=[Length(max=500, message='Max 500 characters')])
-    dp3 = FloatField('Max DP3 value', validators=[InputRequired('Value required')])
-    gos = FloatField('Max GOS value', validators=[InputRequired('Value required')])
-    graph_loc = StringField('Graph location', validators=[Length(max=200, message='Max 200 characters')])
-    temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required')])
-    enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required')])
+    temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required'), Length(max=20)])
+    enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required', Length(max=20))])
     misc = StringField('Graph location', validators=[Length(max=500, message='Max 500 characters')])
+    results_id = FloatField('Results id')
+
+
+
 
 # remove graph_loc and make dp3 and gos csv string and make a column called intervals(required=False) e.g. hourly
 # with viewing to using plotly api
