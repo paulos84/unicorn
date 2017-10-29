@@ -56,11 +56,14 @@ class ExperimentForm(FlaskForm):
     results_id = FloatField('Results id')
 
 
+class ResultsForm(FlaskForm):
+    time = StringField('Time intervals (hours in integers and decimals)')
+    dp3 = StringField('')
+    dp2_split = StringField('')
+    dp2 = StringField('')
+    glu = StringField('')
+    gal = StringField('')
 
-
-# remove graph_loc and make dp3 and gos csv string and make a column called intervals(required=False) e.g. hourly
-# with viewing to using plotly api
-# set up so run and store data locally on s mans comp...pip install requirements
 
 @app.route('/api/create', methods=['GET', 'POST'])
 def create_exp():
