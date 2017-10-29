@@ -57,12 +57,13 @@ class ExperimentForm(FlaskForm):
 
 
 class ResultsForm(FlaskForm):
-    time = StringField('Time intervals (hours in integers and decimals)')
-    dp3 = StringField('')
-    dp2_split = StringField('')
-    dp2 = StringField('')
-    glu = StringField('')
-    gal = StringField('')
+    #make note on html form to record all in list of ints/decimals separated by commas, represent either hour or percentages
+    time = StringField('Time intervals')
+    dp3 = StringField('DP3+ values')
+    dp2_split = StringField('DP2 Split(% DP2 GOS in the DP2 Fraction')
+    dp2 = StringField('DP2 values')
+    glu = StringField('Glucose values')
+    gal = StringField('Galactose values')
 
 
 @app.route('/api/create', methods=['GET', 'POST'])
