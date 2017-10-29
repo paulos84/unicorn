@@ -1,0 +1,54 @@
+{% from "_render_field.html" import render_field %}
+<html>
+<head>
+<title>Create Experiment</title>
+</head>
+<body>
+	<form method="POST" action="{{url_for('create_exp') }}">
+	    {{ form.csrf_token }}
+	    {{ render_field(form.name) }}
+	    <ul>
+            {% for error in form.name.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {{ render_field(form.notes) }}
+		<ul>
+            {% for error in form.notes.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {{ render_field(form.dp3) }}
+		<ul>
+            {% for error in form.dp3.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+	    {{ render_field(form.gos) }}
+            		<ul>
+            {% for error in form.gos.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {{ render_field(form.graph_loc) }}
+        		<ul>
+            {% for error in form.graph_loc.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+            {{ render_field(form.temp) }}
+            		<ul>
+            {% for error in form.temp.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {{ render_field(form.enz_dose) }}
+            		<ul>
+            {% for error in form.enz_dose.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+	    <input type="submit" value="Submit">
+	</form>
+</body>
+</html>
