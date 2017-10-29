@@ -31,9 +31,13 @@ class Conditions(db.Model):
 
 class Results(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    dp3 = db.Column(db.Float(200), nullable=False)
-    gos = db.Column(db.Float(200), nullable=False)
-    exp = db.relationship('Experiment', backref='conditions', lazy='dynamic')
+    time = db.Column(db.Float(20))
+    dp3 = db.Column(db.Float(20))
+    dp2_split = db.Column(db.Float(20))
+    dp2 = db.Column(db.Float(20))
+    glu = db.Column(db.Float(20))
+    gal = db.Column(db.Float(20))
+    exp = db.relationship('Experiment', backref='results', lazy='dynamic')
 
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
