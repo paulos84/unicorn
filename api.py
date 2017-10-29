@@ -17,10 +17,8 @@ class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     notes = db.Column(db.String(500))
-    dp3 = db.Column(db.Float(200), nullable=False)
-    gos = db.Column(db.Float(200), nullable=False)
-    graph_loc = db.Column(db.String(200))
     cond = db.Column(db.Integer, db.ForeignKey('conditions.id'))
+    results = db.Column(db.Integer, db.ForeignKey('results.id'))
 
 
 class Conditions(db.Model):
@@ -28,6 +26,13 @@ class Conditions(db.Model):
     temp = db.Column(db.Float(10), nullable=False)
     enz_dose = db.Column(db.Float(20), nullable=False)
     misc = db.Column(db.String(500))
+    exp = db.relationship('Experiment', backref='conditions', lazy='dynamic')
+
+
+class Results(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    dp3 = db.Column(db.Float(200), nullable=False)
+    gos = db.Column(db.Float(200), nullable=False)
     exp = db.relationship('Experiment', backref='conditions', lazy='dynamic')
 
 
