@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_restless import APIManager
 from flask_wtf import FlaskForm
@@ -6,7 +6,6 @@ from wtforms import StringField, FloatField
 from wtforms.validators import InputRequired, Length
 from flask_migrate import Manager, Migrate, MigrateCommand
 import requests
-import json
 
 
 app = Flask(__name__)
@@ -22,7 +21,6 @@ class Experiment(db.Model):
     gos = db.Column(db.Float(200), nullable=False)
     graph_loc = db.Column(db.String(200))
     cond = db.Column(db.Integer, db.ForeignKey('conditions.id'))
-# hold just single peak dp3/gos instead of sequence - allow query - use int or float?
 
 
 class Conditions(db.Model):
@@ -50,71 +48,30 @@ class ExperimentForm(FlaskForm):
     enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required')])
     misc = StringField('Graph location', validators=[Length(max=500, message='Max 500 characters')])
 
+# remove graph_loc and make dp3 and gos csv string and make a column called intervals(required=False) e.g. hourly
+# with viewing to using plotly api
+# set up so run and store data locally on s mans comp...pip install requirements
 
-@app.route('/create', methods=['GET', 'POST'])
+@app.route('/api/create', methods=['GET', 'POST'])
 def create_exp():
     exp_form = ExperimentForm()
-    name = request.form.get('name')
-    notes = request.form.get('notes')
-    dp3 = request.form.get('dp3')
-    gos = request.form.get('gos')
-    graph_loc = request.form.get('graph_loc')
-    temp = request.form.get('temp')
-    enz_dose = request.form.get('enz_dose')
-    misc = request.form.get('misc')
     if exp_form.validate_on_submit():
-        #return 'success {}'.format(name)
-        qs = Conditions.query.all()
-        if [temp, enz_dose, misc] == [qs.temp, qs.enz_dose, qs.misc]:
-            conditions_id = qs.id
-            var = (sdf)
-            db.session.add(var)
-            db.session.commit()
-            new_dict =
-            return redirect(repeat_conditions(new_dict))
-        sdfgfd =
-        bdf =
-        return redirect(new_conditions(request)
+        temp = request.form.get('temp')
+        enz_dose = request.form.get('enz_dose')
+        misc = request.form.get('misc')
+        form_data = {a: b for a, b in request.form.items() if a != 'csrf_token' and b != ''}
+        exp_data = {key: form_data[key] for key in form_data if key in ('name', 'notes', 'dp3', 'gos', 'graph_loc')}
+        conditions = {key: form_data[key] for key in form_data if key in ('temp', 'enz_dose', 'misc')}
+        url = 'http://127.0.0.1:8080/api/experiment'
+        qs = Conditions.query.filter_by(temp=temp, enz_dose=enz_dose).first()
+        if [temp, enz_dose, misc] == [qs.temp, qs.enz_dose, None] or [qs.temp, qs.enz_dose, qs.misc]:
+            exp_data['conditions'] = {'id': qs.id}
+            requests.post(url, json=exp_data)
+            return jsonify(exp_data)
+        exp_data['conditions'] = conditions
+        requests.post(url, json=exp_data)
+        return jsonify(exp_data)
     return render_template('exp_form.html', form=exp_form)
-
-
-
->>>po = {'sop': 4, 're': 7, 'pl': None}
->>>ay = {a:b for a,b in po.items() if b is not None}
->>>ay
-{'re': 7, 'sop': 4}
-
-
-@app.route('/api/experiment', methods=['POST'])
-def repeat_conditions(conditions_id, request):
-    json_dict
-    return jsonify(...)
-
-or
-
-@app.route('/api/'experiment, methods=['POST'])
-def new_conditions(request):
-    payload = {
-    "conditions": {
-    "enz_dose": 17.0,
-    "misc": null,
-    "temp": 69.0
-    },
-    "dp3": 27.0,
-    "gos": 38.0,
-    "graph_loc": null,
-    "name": "exp125",
-    "notes": "second"
-    }
-    return jsonify(...)
-
-requests.post()
-"""
-
-
-
-
-qs = Conditions.query.all()
 
 
 migrate = Migrate(app, db)
@@ -123,7 +80,4 @@ db_manager.add_command('db', MigrateCommand)
 
 
 if __name__ == '__main__':
-    app.run(port=8080)
-
-
-
+    app.run(port=8080, threaded=True)
