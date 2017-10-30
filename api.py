@@ -7,7 +7,6 @@ from wtforms.validators import InputRequired, Length
 from flask_migrate import Manager, Migrate, MigrateCommand
 import requests
 
-
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
 db = SQLAlchemy(app)
@@ -31,7 +30,7 @@ class Conditions(db.Model):
 
 class Results(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    time = db.Column(db.Float(20))
+    times = db.Column(db.Float(20))
     dp3 = db.Column(db.Float(20))
     dp2_split = db.Column(db.Float(20))
     dp2 = db.Column(db.Float(20))
@@ -57,13 +56,22 @@ class ExperimentForm(FlaskForm):
 
 
 class ResultsForm(FlaskForm):
-    #make note on html form to record all in list of ints/decimals separated by commas, represent either hour or percentages
-    time = StringField('Time intervals')
+    # make note on html form to record all in list of ints/decimals separated by commas, represent either hour or percentages
+    times = StringField('Time intervals')
     dp3 = StringField('DP3+ values')
     dp2_split = StringField('DP2 Split(% DP2 GOS in the DP2 Fraction')
     dp2 = StringField('DP2 values')
     glu = StringField('Glucose values')
     gal = StringField('Galactose values')
+
+
+def add_results(form):
+    data = Results(times=form.get('times'), dp3=form.get('dp3'), dp2_split=form.get('dp2_split'), dp2=form.get('dp2'),
+                   glu=form.get('glu'), gal=form.get('gal'))
+    db.session.add(data)
+    db.session.commit()
+    query = Results.query. --just added-- .first()
+    return query.id  #????????????????????
 
 
 @app.route('/api/create', methods=['GET', 'POST'])
@@ -74,15 +82,18 @@ def create_exp():
         enz_dose = request.form.get('enz_dose')
         misc = request.form.get('misc')
         form_data = {a: b for a, b in request.form.items() if a != 'csrf_token' and b != ''}
-        exp_data = {key: form_data[key] for key in form_data if key in ('name', 'notes', 'dp3', 'gos', 'graph_loc')}
+        exp_data = {key: form_data[key] for key in form_data if key in ('name', 'notes')}
         conditions = {key: form_data[key] for key in form_data if key in ('temp', 'enz_dose', 'misc')}
         url = 'http://127.0.0.1:8080/api/experiment'
         qs = Conditions.query.filter_by(temp=temp, enz_dose=enz_dose).first()
         if [temp, enz_dose, misc] == [qs.temp, qs.enz_dose, None] or [qs.temp, qs.enz_dose, qs.misc]:
             exp_data['conditions'] = {'id': qs.id}
+            url = 'http://127.0.0.1:8080/api/experiment'
             requests.post(url, json=exp_data)
             return jsonify(exp_data)
         exp_data['conditions'] = conditions
+        results_id = add_results(requests.form)
+        exp_data['results_id'] = results_id
         requests.post(url, json=exp_data)
         return jsonify(exp_data)
     return render_template('exp_form.html', form=exp_form)
