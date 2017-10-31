@@ -23,7 +23,7 @@ class Experiment(db.Model):
     name = db.Column(db.String(50), nullable=False)
     notes = db.Column(db.String(500))
     cond = db.Column(db.Integer, db.ForeignKey('conditions.id'))
-    results = db.Column(db.Integer, db.ForeignKey('results.id'))
+    results_id = db.Column(db.Integer, db.ForeignKey('results.id'))
 
 
 class Conditions(db.Model):
@@ -57,7 +57,7 @@ class ExperimentForm(FlaskForm):
                                                       Length(max=50, message='Max 50 characters')])
     notes = StringField('Notes on aim, summary etc.', validators=[Length(max=500, message='Max 500 characters')])
     temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required'), Length(max=20)])
-    enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required', Length(max=20))])
+    enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required'), Length(max=20)])
     misc = StringField('Graph location', validators=[Length(max=500, message='Max 500 characters')])
     file = FileField()
 
@@ -82,7 +82,7 @@ def create_exp():
         data = {key: form.data[key] for key in form.data if key in ('name', 'notes', 'dp3', 'gos', 'graph_loc')}
         cond = {key: form.data[key] for key in form.data if key in ('temp', 'enz_dose', 'misc')}
         results_id = add_results(form.file)
-        data['results'] = {'id': results_id}
+        data['results_id'] = {'id': results_id}
         url = 'http://127.0.0.1:8080/api/experiment'
         qs = Conditions.query.filter_by(temp=cond['temp'], enz_dose=cond['enz_dose'], misc=cond['misc']).first()
         if qs:
