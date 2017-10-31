@@ -4,13 +4,11 @@ from flask_restless import APIManager
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField
 from wtforms.validators import InputRequired, Length
-from flask_migrate import Manager, Migrate, MigrateCommand
 from flask_wtf.file import FileField
-from wtforms.validators import InputRequired, Length
 from werkzeug.utils import secure_filename
-import requests
-
+from flask_migrate import Manager, Migrate, MigrateCommand
 import pandas as pd
+import requests
 
 
 app = Flask(__name__)
@@ -68,7 +66,6 @@ def add_results(results_file):
     df = pd.read_csv('uploads/{}'.format(filename))
     labels = ['times', 'dp3', 'dp2_split', 'dp2', 'glu', 'gal']
     results_dict = {a: [','.join([str(b) for b in df[a]])][0] for a in labels}
-    # if results_dict['dp2_split'] == '', replace with '0'
     results = Results(**results_dict)
     db.session.add(results)
     db.session.commit()
