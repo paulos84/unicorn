@@ -18,24 +18,6 @@
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
-        {{ render_field(form.dp3) }}
-		<ul>
-            {% for error in form.dp3.errors %}
-            <li style="color:red;">{{ error }}</li>
-            {% endfor %}
-        </ul>
-	    {{ render_field(form.gos) }}
-            		<ul>
-            {% for error in form.gos.errors %}
-            <li style="color:red;">{{ error }}</li>
-            {% endfor %}
-        </ul>
-        {{ render_field(form.graph_loc) }}
-        		<ul>
-            {% for error in form.graph_loc.errors %}
-            <li style="color:red;">{{ error }}</li>
-            {% endfor %}
-        </ul>
             {{ render_field(form.temp) }}
             		<ul>
             {% for error in form.temp.errors %}
@@ -48,6 +30,7 @@
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
+            {{ render_field(form.file) }}
 	    <input type="submit" value="Submit">
 	</form>
 </body>
