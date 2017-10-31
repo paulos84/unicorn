@@ -17,13 +17,13 @@ db = SQLAlchemy(app)
 
 class Results(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    time = db.Column(db.Float(20))
-    dp3 = db.Column(db.Float(20))
-    dp2_split = db.Column(db.Float(20))
-    dp2 = db.Column(db.Float(20))
-    glu = db.Column(db.Float(20))
-    gal = db.Column(db.Float(20))
-    exp = db.relationship('Results', backref='results', lazy='dynamic')
+    times = db.Column(db.String(200))
+    dp3 = db.Column(db.String(200))
+    dp2_split = db.Column(db.String(200))
+    dp2 = db.Column(db.String(200))
+    glu = db.Column(db.String(200))
+    gal = db.Column(db.String(200))
+
 
 
 class ExperimentForm(FlaskForm):
@@ -34,14 +34,19 @@ class ExperimentForm(FlaskForm):
 
 @app.route('/api/create', methods=['GET', 'POST'])
 def create_exp():
-    form = ExperimentForm()
-    if form.validate_on_submit():
-        name = form.data.get('name')
-        filename = secure_filename(form.file.data.filename)
-        form.file.data.save('uploads/' + filename)
+    exp_form = ExperimentForm()
+    if exp_form.validate_on_submit():
+        name = exp_form.data.get('name')
+        filename = secure_filename(exp_form.file.data.filename)
+        exp_form.file.data.save('uploads/' + filename)
         df = pd.read_csv('uploads/{}'.format(filename))
-        return str(df['times'].iloc[0])
-    return render_template('exp_form.html', form=form)
+        labels = ['times', 'dp3', 'dp2_split', 'dp2', 'glu', 'gal']
+        results_dict = {a: [','.join([str(b) for b in df[a]])][0] for a in labels}
+        results = Results(**results_dict)
+        db.session.add(results)
+        db.session.commit()
+        return str(results.id)
+    return render_template('exp_form.html', form=exp_form)
 
 
 if __name__ == '__main__':
