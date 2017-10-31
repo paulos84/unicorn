@@ -39,7 +39,8 @@ def create_exp():
         name = form.data.get('name')
         filename = secure_filename(form.file.data.filename)
         form.file.data.save('uploads/' + filename)
-        return filename
+        df = pd.read_csv('uploads/{}'.format(filename))
+        return str(df['times'].iloc[0])
     return render_template('exp_form.html', form=form)
 
 
