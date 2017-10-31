@@ -7,6 +7,7 @@ from wtforms.validators import InputRequired, Length
 from flask_migrate import Manager, Migrate, MigrateCommand
 import requests
 
+
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
 db = SQLAlchemy(app)
@@ -16,8 +17,10 @@ class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     notes = db.Column(db.String(500))
+    dp3 = db.Column(db.Float(200), nullable=False)
+    gos = db.Column(db.Float(200), nullable=False)
+    graph_loc = db.Column(db.String(200))
     cond = db.Column(db.Integer, db.ForeignKey('conditions.id'))
-    results = db.Column(db.Integer, db.ForeignKey('results.id'))
 
 
 class Conditions(db.Model):
@@ -26,17 +29,6 @@ class Conditions(db.Model):
     enz_dose = db.Column(db.Float(20), nullable=False)
     misc = db.Column(db.String(500))
     exp = db.relationship('Experiment', backref='conditions', lazy='dynamic')
-
-
-class Results(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    times = db.Column(db.Float(20))
-    dp3 = db.Column(db.Float(20))
-    dp2_split = db.Column(db.Float(20))
-    dp2 = db.Column(db.Float(20))
-    glu = db.Column(db.Float(20))
-    gal = db.Column(db.Float(20))
-    exp = db.relationship('Results', backref='results', lazy='dynamic')
 
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
@@ -49,54 +41,33 @@ class ExperimentForm(FlaskForm):
     name = StringField('Experiment name', validators=[InputRequired('Experiment name is required'),
                                                       Length(max=50, message='Max 50 characters')])
     notes = StringField('Notes on aim, summary etc.', validators=[Length(max=500, message='Max 500 characters')])
-    temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required'), Length(max=20)])
-    enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required', Length(max=20))])
+    dp3 = FloatField('Max DP3 value', validators=[InputRequired('Value required')])
+    gos = FloatField('Max GOS value', validators=[InputRequired('Value required')])
+    graph_loc = StringField('Graph location', validators=[Length(max=200, message='Max 200 characters')])
+    temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required')])
+    enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required')])
     misc = StringField('Graph location', validators=[Length(max=500, message='Max 500 characters')])
-    results_id = FloatField('Results id')
 
-
-class ResultsForm(FlaskForm):
-    # make note on html form to record all in list of ints/decimals separated by commas, represent either hour or percentages
-    times = StringField('Time intervals')
-    dp3 = StringField('DP3+ values')
-    dp2_split = StringField('DP2 Split(% DP2 GOS in the DP2 Fraction')
-    dp2 = StringField('DP2 values')
-    glu = StringField('Glucose values')
-    gal = StringField('Galactose values')
-
-
-def add_results(form):
-    data = Results(times=form.get('times'), dp3=form.get('dp3'), dp2_split=form.get('dp2_split'), dp2=form.get('dp2'),
-                   glu=form.get('glu'), gal=form.get('gal'))
-    db.session.add(data)
-    db.session.commit()
-    query = Results.query. --just added-- .first()
-    return query.id  #????????????????????
-
+# remove graph_loc and make dp3 and gos csv string and make a column called intervals(required=False) e.g. hourly
+# with viewing to using plotly api
+# set up so run and store data locally on s mans comp...pip install requirements
 
 @app.route('/api/create', methods=['GET', 'POST'])
 def create_exp():
-    exp_form = ExperimentForm()
-    if exp_form.validate_on_submit():
-        temp = request.form.get('temp')
-        enz_dose = request.form.get('enz_dose')
-        misc = request.form.get('misc')
-        form_data = {a: b for a, b in request.form.items() if a != 'csrf_token' and b != ''}
-        exp_data = {key: form_data[key] for key in form_data if key in ('name', 'notes')}
-        conditions = {key: form_data[key] for key in form_data if key in ('temp', 'enz_dose', 'misc')}
+    form = ExperimentForm()
+    if form.validate_on_submit():
+        data = {key: form.data[key] for key in form.data if key in ('name', 'notes', 'dp3', 'gos', 'graph_loc')}
+        cond = {key: form.data[key] for key in form.data if key in ('temp', 'enz_dose', 'misc')}
         url = 'http://127.0.0.1:8080/api/experiment'
-        qs = Conditions.query.filter_by(temp=temp, enz_dose=enz_dose).first()
-        if [temp, enz_dose, misc] == [qs.temp, qs.enz_dose, None] or [qs.temp, qs.enz_dose, qs.misc]:
-            exp_data['conditions'] = {'id': qs.id}
-            url = 'http://127.0.0.1:8080/api/experiment'
-            requests.post(url, json=exp_data)
-            return jsonify(exp_data)
-        exp_data['conditions'] = conditions
-        results_id = add_results(requests.form)
-        exp_data['results_id'] = results_id
-        requests.post(url, json=exp_data)
-        return jsonify(exp_data)
-    return render_template('exp_form.html', form=exp_form)
+        qs = Conditions.query.filter_by(temp=cond['temp'], enz_dose=cond['enz_dose'], misc=cond['misc']).first()
+        if qs:
+            data['conditions'] = {'id': qs.id}
+            requests.post(url, json=data)
+            return jsonify(data)
+        data['conditions'] = cond
+        requests.post(url, json=data)
+        return jsonify(data)
+    return render_template('exp_form.html', form=form)
 
 
 migrate = Migrate(app, db)
