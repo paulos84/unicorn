@@ -4,11 +4,17 @@
 <title>Create Experiment</title>
 </head>
 <body>
-	<form method="POST" action="{{url_for('create_exp') }}">
+	<form method="POST" action="{{url_for('create_exp') }}" enctype="multipart/form-data">
 	    {{ form.csrf_token }}
 	    {{ render_field(form.name) }}
 	    <ul>
             {% for error in form.name.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+        	    {{ render_field(form.date) }}
+         <ul>
+            {% for error in form.date.errors %}
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
