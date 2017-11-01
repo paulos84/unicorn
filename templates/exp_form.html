@@ -36,6 +36,12 @@
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
+                {{ render_field(form.misc) }}
+            		<ul>
+            {% for error in form.misc.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
             {{ render_field(form.file) }}
 	    <input type="submit" value="Submit">
 	</form>
