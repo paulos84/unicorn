@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, url_for, redirect
+from flask import Flask, request, render_template, url_for, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField
@@ -7,6 +7,7 @@ from wtforms.validators import InputRequired, Length
 from werkzeug.utils import secure_filename
 from flask_restless import APIManager
 import os
+import requests
 
 import pandas as pd
 
@@ -56,8 +57,8 @@ class ExperimentForm(FlaskForm):
     notes = StringField('Notes on aim, summary etc.')
     temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required')])
     enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required')])
-    misc = StringField('Graph location')
-    file = FileField()
+    misc = StringField('Notes relating to conditions')
+    file = FileField('Results csv file')
 
 
 def add(filename):
@@ -81,9 +82,17 @@ def create_exp():
         form.file.data.save('uploads/' + filename)
         results_id = add(filename)
         data['results'] = {'id': results_id}
-        return results_id
+        url = 'http://127.0.0.1:8080/api/experiment'
+        qs = Conditions.query.filter_by(temp=cond['temp'], enz_dose=cond['enz_dose'], misc=cond['misc']).first()
+        if qs:
+            data['conditions'] = {'id': qs.id}
+            requests.post(url, json=data)
+            return jsonify(data)
+        data['conditions'] = cond
+        requests.post(url, json=data)
+        return jsonify(data)
     return render_template('exp_form.html', form=form)
 
 
 if __name__ == '__main__':
-    app.run(port=8000, threaded=True)
+    app.run(port=8080, threaded=True)
