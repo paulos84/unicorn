@@ -4,11 +4,13 @@ from flask_restless import APIManager
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField
 from wtforms.validators import InputRequired, Length
-from flask_wtf.file import FileField
-from werkzeug.utils import secure_filename
 from flask_migrate import Manager, Migrate, MigrateCommand
-import pandas as pd
+from flask_wtf.file import FileField
+from wtforms.validators import InputRequired, Length
+from werkzeug.utils import secure_filename
 import requests
+
+import pandas as pd
 
 
 app = Flask(__name__)
@@ -19,7 +21,8 @@ db = SQLAlchemy(app)
 class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
-    notes = db.Column(db.String(500))
+    date = db.Column(db.String(50), nullable=False)
+    notes = db.Column(db.String(800))
     cond = db.Column(db.Integer, db.ForeignKey('conditions.id'))
     results_id = db.Column(db.Integer, db.ForeignKey('results.id'))
 
@@ -51,12 +54,12 @@ manager.create_api(Results, methods=['GET', 'POST', 'PUT', 'DELETE'])
 
 
 class ExperimentForm(FlaskForm):
-    name = StringField('Experiment name', validators=[InputRequired('Experiment name is required'),
-                                                      Length(max=50, message='Max 50 characters')])
-    notes = StringField('Notes on aim, summary etc.', validators=[Length(max=500, message='Max 500 characters')])
-    temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required'), Length(max=20)])
-    enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required'), Length(max=20)])
-    misc = StringField('Graph location', validators=[Length(max=500, message='Max 500 characters')])
+    name = StringField('Experiment name', validators=[InputRequired('Experiment name is required')])
+    date = StringField('Notes on aim, summary etc.', validators=[InputRequired('Date is required')])
+    notes = StringField('Notes on aim, summary etc.')
+    temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required')])
+    enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required')])
+    misc = StringField('Graph location')
     file = FileField()
 
 
@@ -66,6 +69,7 @@ def add_results(results_file):
     df = pd.read_csv('uploads/{}'.format(filename))
     labels = ['times', 'dp3', 'dp2_split', 'dp2', 'glu', 'gal']
     results_dict = {a: [','.join([str(b) for b in df[a]])][0] for a in labels}
+    # if results_dict['dp2_split'] == '', replace with '0'
     results = Results(**results_dict)
     db.session.add(results)
     db.session.commit()
