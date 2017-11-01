@@ -73,14 +73,16 @@ def add(filename):
 
 @app.route('/api/create', methods=['GET', 'POST'])
 def create_exp():
-    exp_form = ExperimentForm()
-    if exp_form.validate_on_submit():
-        name = exp_form.data.get('name')
-        filename = secure_filename(exp_form.file.data.filename)
-        exp_form.file.data.save('uploads/' + filename)
+    form = ExperimentForm()
+    if form.validate_on_submit():
+        data = {key: form.data[key] for key in form.data if key in ('name', 'date', 'notes')}
+        cond = {key: form.data[key] for key in form.data if key in ('temp', 'enz_dose', 'misc')}
+        filename = secure_filename(form.file.data.filename)
+        form.file.data.save('uploads/' + filename)
         results_id = add(filename)
+        data['results'] = {'id': results_id}
         return results_id
-    return render_template('exp_form.html', form=exp_form)
+    return render_template('exp_form.html', form=form)
 
 
 if __name__ == '__main__':
