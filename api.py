@@ -1,9 +1,9 @@
-from flask import Flask, request, render_template, url_for, redirect, jsonify
+from flask import Flask, render_template, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField
-from flask_wtf.file import FileField
-from wtforms.validators import InputRequired, Length
+from flask_wtf.file import FileField, FileRequired, FileAllowed
+from wtforms.validators import InputRequired
 from werkzeug.utils import secure_filename
 from flask_restless import APIManager
 import os
@@ -58,7 +58,7 @@ class ExperimentForm(FlaskForm):
     temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required')])
     enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required')])
     misc = StringField('Notes relating to conditions')
-    file = FileField('Results csv file')
+    file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
 
 
 def add(filename):
