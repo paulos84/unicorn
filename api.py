@@ -6,7 +6,6 @@ from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import InputRequired
 from werkzeug.utils import secure_filename
 from flask_restless import APIManager
-import os
 import requests
 
 import pandas as pd
@@ -45,7 +44,7 @@ class Results(db.Model):
 
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
-# default endpoint: 127.0.0.1:5000/api/experiment
+# default endpoint: 127.0.0.1:8080/api/experiment
 manager.create_api(Experiment, methods=['GET', 'POST', 'PUT', 'DELETE'])
 manager.create_api(Conditions, methods=['GET', 'POST', 'PUT', 'DELETE'])
 manager.create_api(Results, methods=['GET', 'POST', 'PUT', 'DELETE'])
@@ -53,7 +52,7 @@ manager.create_api(Results, methods=['GET', 'POST', 'PUT', 'DELETE'])
 
 class ExperimentForm(FlaskForm):
     name = StringField('Experiment name', validators=[InputRequired('Experiment name is required')])
-    date = StringField('Date of experiment', validators=[InputRequired('Date is required')])
+    date = StringField('Date of experiment', validators=[InputRequired('Date format e.g. 2017-10-01')])
     notes = StringField('Notes on aim, summary etc.')
     temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required')])
     enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required')])
@@ -61,7 +60,7 @@ class ExperimentForm(FlaskForm):
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
 
 
-def add(filename):
+def add_results(filename):
     df = pd.read_csv('uploads/{}'.format(filename))
     labels = ['times', 'dp3', 'dp2_split', 'dp2', 'glu', 'gal']
     results_dict = {a: [','.join([str(b) for b in df[a]])][0] for a in labels}
@@ -69,7 +68,7 @@ def add(filename):
     results = Results(**results_dict)
     db.session.add(results)
     db.session.commit()
-    return str(results.id)
+    return results.id
 
 
 @app.route('/api/create', methods=['GET', 'POST'])
@@ -80,7 +79,7 @@ def create_exp():
         cond = {key: form.data[key] for key in form.data if key in ('temp', 'enz_dose', 'misc')}
         filename = secure_filename(form.file.data.filename)
         form.file.data.save('uploads/' + filename)
-        results_id = add(filename)
+        results_id = add_results(filename)
         data['results'] = {'id': results_id}
         url = 'http://127.0.0.1:8080/api/experiment'
         qs = Conditions.query.filter_by(temp=cond['temp'], enz_dose=cond['enz_dose'], misc=cond['misc']).first()
