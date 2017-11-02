@@ -56,7 +56,7 @@ class ExperimentForm(FlaskForm):
     notes = StringField('Notes on aim, summary etc.')
     temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required')])
     enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required')])
-    misc = StringField('Notes relating to conditions')
+    misc = StringField(label='Notes relating to conditions', default='404 g lactose, 225.6g water')
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
 
 
