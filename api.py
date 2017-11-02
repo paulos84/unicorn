@@ -6,9 +6,8 @@ from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import InputRequired
 from werkzeug.utils import secure_filename
 from flask_restless import APIManager
-import requests
-
 import pandas as pd
+import requests
 
 
 app = Flask(__name__)
@@ -44,12 +43,13 @@ class Results(db.Model):
 
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
-# default endpoint: 127.0.0.1:8080/api/experiment
+# default endpoint: 127.0.0.1:5000/api/experiment
 manager.create_api(Experiment, methods=['GET', 'POST', 'PUT', 'DELETE'])
 manager.create_api(Conditions, methods=['GET', 'POST', 'PUT', 'DELETE'])
 manager.create_api(Results, methods=['GET', 'POST', 'PUT', 'DELETE'])
 
 
+#to do add DateField for dates
 class ExperimentForm(FlaskForm):
     name = StringField('Experiment name', validators=[InputRequired('Experiment name is required')])
     date = StringField('Date of experiment', validators=[InputRequired('Date format e.g. 2017-10-01')])
@@ -64,7 +64,6 @@ def add_results(filename):
     df = pd.read_csv('uploads/{}'.format(filename))
     labels = ['times', 'dp3', 'dp2_split', 'dp2', 'glu', 'gal']
     results_dict = {a: [','.join([str(b) for b in df[a]])][0] for a in labels}
-    # if results_dict['dp2_split'] == '', replace with '0'
     results = Results(**results_dict)
     db.session.add(results)
     db.session.commit()
@@ -94,4 +93,4 @@ def create_exp():
 
 
 if __name__ == '__main__':
-    app.run(port=8080, threaded=True)
+    app.run(port=5000, threaded=True)
