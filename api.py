@@ -28,7 +28,11 @@ class Conditions(db.Model)
     id = db.Column(db.Integer, primary_key=True)
     temp = db.Column(db.Float(50), nullable=False)
     enz_dose = db.Column(db.Float(50), nullable=False)
-    misc = db.Column(db.String(500))
+    lac = db.Column(db.Float(50), nullable=False)
+    h20 = db.Column(db.Float(50), nullable=False)
+    glu = db.Column(db.Float(50))
+    gal = db.Column(db.Float(50))
+    description = db.Column(db.String(500))
     exp = db.relationship('Experiment', backref='conditions', lazy='dynamic')
 
 
@@ -55,7 +59,11 @@ class ExperimentForm(FlaskForm)
     notes = StringField('Notes on aim, summary etc.')
     temp = FloatField(Temp ('C), validators=[InputRequired('Temperature value required')])
     enz_dose = FloatField('Enzyme dose (g)', validators=[InputRequired('Enzyme dose required')])
-    misc = StringField(label='Notes relating to conditions', default='404g lactose, 225.6g water')
+    lac = FloatField('lactose monohydrate (g)', validators=[InputRequired('Lactose amount required')])
+    h20 = FloatField('water (g)', validators=[InputRequired('Water amount required')])
+    glu = FloatField('glucose (g)')
+    gal = FloatField('galactose (g)')                    
+    description = StringField(label='Notes relating to conditions', default='404g lactose, 225.6g water')
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
 
 
@@ -74,6 +82,7 @@ def create_exp()
     form = ExperimentForm()
     if form.validate_on_submit()
         data = {key form.data[key] for key in form.data if key in ('name', 'date', 'notes')}
+        #NEED TO UPDATE FOLLOWING LINE:
         cond = {key form.data[key] for key in form.data if key in ('temp', 'enz_dose', 'misc')}
         filename = secure_filename(form.file.data.filename)
         form.file.data.save('uploads' + filename)
