@@ -1,8 +1,9 @@
-A database and API created for white unicorn enzyme reaction trials.  
+An application to create and manage a database for recording data relating to enzyme reaction trials.  
 
 
-The API gives access to the database. It follows REST design principles, providing data in JSON format through endpoints detailed as follows.
+It provides an API to allow the database to be queried as well as updated, in addition to html forms and csv file upload or experiment results. The API follows REST design principles, providing data in JSON format through endpoints detailed as follows.
 
+...Charts
 
 Clone this repo to your local machine. In the top level directory, create a virtual environment:
 
