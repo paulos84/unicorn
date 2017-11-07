@@ -4,22 +4,14 @@ A database and API created for white unicorn enzyme reaction trials.
 The API gives access to the database. It follows REST design principles, providing data in JSON format through endpoints detailed as follows.
 
 
-Install
--------
+Clone this repo to your local machine. In the top level directory, create a virtual environment:
 
- - Python 3
+    $ virtualenv flask-aws
+    $ source flask-aws/bin/activate
 
-   - https://www.python.org
-
- - PIP (Python package manager)
-
-   - https://pypi.python.org/pypi/pip
-      
-After cloning the repository, run the following commands from the project's root directory:
-
-    pip install --upgrade pip
-
-    pip install -r requirements.txt
+Now install the required modules:
+ 
+    $ pip install -r requirements.txt
     
 
 Create and populate database
