@@ -67,9 +67,9 @@ class ExperimentForm(FlaskForm):
 
 def add_results(filename):
     df = pd.read_csv('uploads/{}'.format(filename))
-    labels = ['time', 'dp3plus', 'dp2', 'glu', 'dp2split']
-    #call .split() on labels in case whitespace surrounding in results csv file??
-    results_dict = {a: [','.join([str(b) for b in df[a]])][0] for a in labels}
+    df.columns = df.columns.str.strip()
+    labels = ['time', 'dp3plus', 'dp2', 'glu', 'gal', 'dp2split']
+    results_dict = {a.strip(): [','.join([str(b) for b in df[a.strip()]])][0] for a in labels}
     results = Results(**results_dict)
     db.session.add(results)
     db.session.commit()
@@ -82,7 +82,7 @@ def create_exp():
     if form.validate_on_submit():
         data = {key: form.data[key] for key in form.data if key in ('name', 'date', 'notes')}
         cond = {key: form.data[key] for key in form.data if key in ('temp', 'enz', 'lac', 'h2o', 'glu', 'desc')}
-        filename = secure_filename(form.file.data.filename)
+        filename = data['name'] + '_results_' + secure_filename(form.file.data.filename)
         form.file.data.save('uploads/' + filename)
         results_id = add_results(filename)
         data['results'] = {'id': results_id}
