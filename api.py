@@ -37,12 +37,12 @@ class Conditions(db.Model):
 
 class Results(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    time = db.Column(db.Float(50))
-    dp3plus = db.Column(db.Float(50))
-    dp2 = db.Column(db.Float(50))
-    glu = db.Column(db.Float(50))
-    gal = db.Column(db.Float(50))
-    dp2split = db.Column(db.Float(50))
+    time = db.Column(db.String(200))
+    dp3plus = db.Column(db.String(200))
+    dp2 = db.Column(db.String(200))
+    glu = db.Column(db.String(200))
+    gal = db.Column(db.String(200))
+    dp2split = db.Column(db.String(200))
 
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
