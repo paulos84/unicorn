@@ -1,7 +1,6 @@
-An application to create and manage a database for recording data relating to enzyme reaction trials.  
+An application created for recording and reviewing data from trials on galacto-oligosaccharide production using an enzyme labelled 'white unicorn'.
 
-
-It provides an API to allow the database to be queried as well as updated, in addition to html forms and csv file upload or experiment results. The API follows REST design principles, providing data in JSON format through endpoints detailed as follows.
+It provides an API to allow the database to be queried as well as updated, To record data in the database, the application provides html forms for recording experiment details along with a field allowing csv files of results to be uploaded. The API allows the database to be queried and updated/edited. The API follows RESTful design principles, providing data in JSON format through endpoints detailed as follows....
 
 ...Charts
 
