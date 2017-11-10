@@ -27,12 +27,18 @@ class Experiment(db.Model):
 class Conditions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     temp = db.Column(db.Float(50), nullable=False)
-    enz_dose = db.Column(db.Float(50), nullable=False)
     lactose = db.Column(db.Float(50), nullable=False)
     water = db.Column(db.Float(50), nullable=False)
     glucose = db.Column(db.Float(50))
     description = db.Column(db.String(800))
     exp = db.relationship('Experiment', backref='conditions', lazy='dynamic')
+    
+    
+class Enzyme(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    batch = db.Column(db.String(50), nullable=False)
+    dose = db.Column(db.Float(50), nullable=False)
 
 
 class Results(db.Model):
