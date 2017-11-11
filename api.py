@@ -8,13 +8,13 @@ from werkzeug.utils import secure_filename
 from flask_restless import APIManager
 import requests
 import pandas as pd
+from wtforms_alchemy.fields import QuerySelectField
+
 
 # To Do - login password protection  - how to do with Flask-Restful/restless?
 # Datefield in wtforms to ensure date format 2017-10-16
-# Validator to check that enz dose is one d.p
 # remove unused relationships?
 # produce schema on paper showing relationships
-# see  one to many and one-to-one  pp vidz
 
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
@@ -36,6 +36,7 @@ class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     date = db.Column(db.String(50), nullable=False)
+    enzyme = db.Column(db.String(50), nullable=False)
     notes = db.Column(db.String(800))
     enzyme_id = db.Column(db.Integer, db.ForeignKey('enzyme.id'))
     conditions_id = db.Column(db.Integer, db.ForeignKey('conditions.id'))
@@ -77,7 +78,7 @@ class ExperimentForm(FlaskForm):
     notes = StringField('Notes on aim, summary etc.')
     temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required')])
                         # To do: make way to add new dose or select from choices
-    enz = SelectField('Enzyme', validators=[InputRequired('Enzyme dose required')])
+    enz = QuerySelectField(query_factory='', allow_blank=False, label='')
     dose = FloatField('Enzyme dose (mg/g)', validators=[InputRequired('Enzyme dose required')])
     lac = FloatField('Lactose monohydrate (g)', default='404', validators=[InputRequired('Lactose amount required')])
     h2o = FloatField('Water (g)', default='225.6', validators=[InputRequired('Water amount required')])
