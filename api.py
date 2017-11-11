@@ -2,13 +2,13 @@ from flask import Flask, render_template, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField, SelectField
+from wtforms_alchemy.fields import QuerySelectField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import InputRequired
 from werkzeug.utils import secure_filename
 from flask_restless import APIManager
 import requests
 import pandas as pd
-from wtforms_alchemy.fields import QuerySelectField
 
 
 # To Do - login password protection  - how to do with Flask-Restful/restless?
@@ -26,10 +26,11 @@ class Enzyme(db.Model):
     enzyme = db.Column(db.String(50), nullable=False)
     dose = db.Column(db.Float(50), nullable=False)
     exp = db.relationship('Experiment', backref='owner', lazy='dynamic')
-    # backref means creating virtual column in the class specified in the string e.g. the Experiment class/table
-    #  so that by referencing experiment.owner can see who the owner is
-    # lazy allows find out all the experiments that the Enzyme instance has by saying e.g. enzyme1.experiments by
-    # e.g. for i in enzyme1: print(i.name) - gives list of experiment names
+    """    
+    backref creates a virtual column in the class specified in the string so that by referencing e.g. experiment1.owner 
+    you can see who the owner is (the enzyme instance). lazy allows you to find out all the experiments that the Enzyme 
+    instance has e.g. [i.name for i in enzyme1] to give a list of experiment names associated with 
+    """
 
 
 class Experiment(db.Model):
