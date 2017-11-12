@@ -16,6 +16,7 @@ from wtforms_alchemy.fields import QuerySelectField
 # remove unused relationships?
 # produce schema on paper showing relationships
 
+
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
 db = SQLAlchemy(app)
@@ -25,7 +26,7 @@ class Enzyme(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     enzyme = db.Column(db.String(50), nullable=False)
     dose = db.Column(db.Float(50), nullable=False)
-    experiments = db.relationship('Experiment', backref='enzyme', lazy='dynamic')
+    experiments = db.relationship('Experiment', backref='owner', lazy='dynamic')
     """
     backref creates a virtual column in the class specified in the string so that by referencing e.g. experiment1.owner
     you can see who the owner is (the enzyme instance). lazy allows you to find out all the experiments that the Enzyme
@@ -51,13 +52,11 @@ class Experiment(db.Model):
     enzyme = db.Column(db.String(50), nullable=False)
     notes = db.Column(db.String(800))
     enzyme_id = db.Column(db.Integer, db.ForeignKey('enzyme.id'))
-    conditions_id = db.Column(db.Integer, db.ForeignKey('conditions.id'))
-    experiments = db.relationship('Results', backref='experiment', lazy='dynamic')
-    
+    method_id = db.Column(db.Integer, db.ForeignKey('method.id'))
 
 
 class ResultsSet(db.Model):
-    __tablename__ = 'results'
+    __tablename__ = 'Results'
     id = db.Column(db.Integer, primary_key=True)
     time = db.Column(db.String(200))
     dp3plus = db.Column(db.String(200))
@@ -65,16 +64,15 @@ class ResultsSet(db.Model):
     glu = db.Column(db.String(200))
     gal = db.Column(db.String(200))
     dp2split = db.Column(db.String(200))
-    results_id = db.Column(db.Integer, db.ForeignKey('results.id'))
+    experiment_id = db.Column(db.Integer, db.ForeignKey('results.id'))
 
-
-exp = db.relationship('Experiment', backref='conditions', lazy='dynamic')
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
 # default endpoint: 127.0.0.1:8080/api/experiment
+manager.create_api(Enzyme, methods=['GET', 'POST', 'PUT', 'DELETE'])
 manager.create_api(Experiment, methods=['GET', 'POST', 'PUT', 'DELETE'])
 manager.create_api(Method, methods=['GET', 'POST', 'PUT', 'DELETE'])
-manager.create_api(Results, methods=['GET', 'POST', 'PUT', 'DELETE'])
+manager.create_api(ResultsSet, methods=['GET', 'POST', 'PUT', 'DELETE'])
 
 
 class ExperimentForm(FlaskForm):
@@ -82,7 +80,6 @@ class ExperimentForm(FlaskForm):
     date = StringField('Date of experiment', validators=[InputRequired('Date format e.g. 2017-10-01')])
     notes = StringField('Notes on aim, summary etc.')
     temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required')])
-                        # To do: make way to add new dose or select from choices
     enz = QuerySelectField(query_factory='', allow_blank=False, label='')
     dose = FloatField('Enzyme dose (mg/g)', validators=[InputRequired('Enzyme dose required')])
     lac = FloatField('Lactose monohydrate (g)', default='404', validators=[InputRequired('Lactose amount required')])
@@ -97,7 +94,7 @@ def add_results(filename):
     df.columns = df.columns.str.strip()
     labels = ['time', 'dp3plus', 'dp2', 'glu', 'gal', 'dp2split']
     results_dict = {a.strip(): [','.join([str(b) for b in df[a.strip()]])][0] for a in labels}
-    results = Results(**results_dict)
+    results = ResultsSet(**results_dict)
     db.session.add(results)
     db.session.commit()
     return results.id
@@ -114,7 +111,7 @@ def create_exp():
         results_id = add_results(filename)
         data['results'] = {'id': results_id}
         url = 'http://127.0.0.1:8080/api/experiment'
-        qs = Conditions.query.filter_by(temp=cond['temp'], enzyme=cond['enz'], lactose=cond['lac'], water=cond['h2o'],
+        qs = Method.query.filter_by(temp=cond['temp'], enzyme=cond['enz'], lactose=cond['lac'], water=cond['h2o'],
                                         glucose=cond['glu'], description=cond['desc']).first()
         if qs:
             data['conditions'] = {'id': qs.id}
