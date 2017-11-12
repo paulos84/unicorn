@@ -54,11 +54,12 @@ class Experiment(db.Model):
     notes = db.Column(db.String(800))
     enzyme_id = db.Column(db.Integer, db.ForeignKey('enzyme.id'))
     method_id = db.Column(db.Integer, db.ForeignKey('method.id'))
+    results_id = db.Column(db.Integer, db.ForeignKey('results.id'))
     results = db.relationship('ResultsSet', backref='owner', lazy='dynamic')
 
 
 class ResultsSet(db.Model):
-    __tablename__ = 'Results'
+    __tablename__ = 'results'
     id = db.Column(db.Integer, primary_key=True)
     time = db.Column(db.String(200))
     dp3plus = db.Column(db.String(200))
@@ -87,7 +88,7 @@ class ExperimentForm(FlaskForm):
     lac = FloatField('Lactose monohydrate (g)', default='404', validators=[InputRequired('Lactose amount required')])
     h2o = FloatField('Water (g)', default='225.6', validators=[InputRequired('Water amount required')])
     glu = FloatField('Glucose (g)')
-    desc = StringField('Notes relating to conditions')
+    desc = StringField('Notes on experiment procedure')
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
 
 
@@ -107,19 +108,20 @@ def create_exp():
     form = ExperimentForm()
     if form.validate_on_submit():
         data = {key: form.data[key] for key in form.data if key in ('name', 'date', 'notes')}
-        cond = {key: form.data[key] for key in form.data if key in ('temp', 'enz', 'lac', 'h2o', 'glu', 'desc')}
+        enzyme_id = 1
+        data['enzyme'] = {'id': enzyme_id}
         filename = data['name'] + '_results_' + secure_filename(form.file.data.filename)
         form.file.data.save('uploads/' + filename)
-        results_id = add_results(filename)
-        data['results'] = {'id': results_id}
+        data['results'] = {'id': add_results(filename)}
         url = 'http://127.0.0.1:8080/api/experiment'
-        qs = Method.query.filter_by(temp=cond['temp'], enzyme=cond['enz'], lactose=cond['lac'], water=cond['h2o'],
-                                        glucose=cond['glu'], description=cond['desc']).first()
+        method = {key: form.data[key] for key in form.data if key in ('temp', 'enz', 'lac', 'h2o', 'glu', 'desc')}
+        qs = Method.query.filter_by(temp=method['temp'], enzyme=method['enz'], lactose=method['lac'], 
+                                    water=method['h2o'], glucose=method['glu'], description=method['desc']).first()
         if qs:
-            data['conditions'] = {'id': qs.id}
+            data['method'] = {'id': qs.id}
             requests.post(url, json=data)
             return jsonify(data)
-        data['conditions'] = cond
+        data['method'] = method
         requests.post(url, json=data)
         return jsonify(data)
     return render_template('exp_form.html', form=form)
