@@ -2,13 +2,13 @@ from flask import Flask, render_template, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField, SelectField
-from wtforms_alchemy.fields import QuerySelectField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import InputRequired
 from werkzeug.utils import secure_filename
 from flask_restless import APIManager
 import requests
 import pandas as pd
+from wtforms_alchemy.fields import QuerySelectField
 
 
 # To Do - login password protection  - how to do with Flask-Restful/restless?
@@ -25,26 +25,15 @@ class Enzyme(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     enzyme = db.Column(db.String(50), nullable=False)
     dose = db.Column(db.Float(50), nullable=False)
-    exp = db.relationship('Experiment', backref='owner', lazy='dynamic')
-    """    
-    backref creates a virtual column in the class specified in the string so that by referencing e.g. experiment1.owner 
-    you can see who the owner is (the enzyme instance). lazy allows you to find out all the experiments that the Enzyme 
-    instance has e.g. [i.name for i in enzyme1] to give a list of experiment names associated with 
+    experiments = db.relationship('Experiment', backref='enzyme', lazy='dynamic')
+    """
+    backref creates a virtual column in the class specified in the string so that by referencing e.g. experiment1.owner
+    you can see who the owner is (the enzyme instance). lazy allows you to find out all the experiments that the Enzyme
+    instance has e.g. by running the query: [i.name for i in enzyme1.experiments.all()]
     """
 
 
-class Experiment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-    date = db.Column(db.String(50), nullable=False)
-    enzyme = db.Column(db.String(50), nullable=False)
-    notes = db.Column(db.String(800))
-    enzyme_id = db.Column(db.Integer, db.ForeignKey('enzyme.id'))
-    conditions_id = db.Column(db.Integer, db.ForeignKey('conditions.id'))
-    results_id = db.Column(db.Integer, db.ForeignKey('results.id'))
-
-
-class Conditions(db.Model):
+class Method(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     temp = db.Column(db.Float(50), nullable=False)
     lactose = db.Column(db.Float(50), nullable=False)
@@ -54,7 +43,21 @@ class Conditions(db.Model):
     exp = db.relationship('Experiment', backref='conditions', lazy='dynamic')
 
 
-class Results(db.Model):
+#one-to-one relationship with results
+class Experiment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    date = db.Column(db.String(50), nullable=False)
+    enzyme = db.Column(db.String(50), nullable=False)
+    notes = db.Column(db.String(800))
+    enzyme_id = db.Column(db.Integer, db.ForeignKey('enzyme.id'))
+    conditions_id = db.Column(db.Integer, db.ForeignKey('conditions.id'))
+    experiments = db.relationship('Results', backref='experiment', lazy='dynamic')
+    
+
+
+class ResultsSet(db.Model):
+    __tablename__ = 'results'
     id = db.Column(db.Integer, primary_key=True)
     time = db.Column(db.String(200))
     dp3plus = db.Column(db.String(200))
@@ -62,6 +65,7 @@ class Results(db.Model):
     glu = db.Column(db.String(200))
     gal = db.Column(db.String(200))
     dp2split = db.Column(db.String(200))
+    results_id = db.Column(db.Integer, db.ForeignKey('results.id'))
 
 
 exp = db.relationship('Experiment', backref='conditions', lazy='dynamic')
@@ -69,7 +73,7 @@ exp = db.relationship('Experiment', backref='conditions', lazy='dynamic')
 manager = APIManager(app, flask_sqlalchemy_db=db)
 # default endpoint: 127.0.0.1:8080/api/experiment
 manager.create_api(Experiment, methods=['GET', 'POST', 'PUT', 'DELETE'])
-manager.create_api(Conditions, methods=['GET', 'POST', 'PUT', 'DELETE'])
+manager.create_api(Method, methods=['GET', 'POST', 'PUT', 'DELETE'])
 manager.create_api(Results, methods=['GET', 'POST', 'PUT', 'DELETE'])
 
 
