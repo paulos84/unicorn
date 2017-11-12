@@ -55,7 +55,7 @@ class Experiment(db.Model):
     enzyme_id = db.Column(db.Integer, db.ForeignKey('enzyme.id'))
     method_id = db.Column(db.Integer, db.ForeignKey('method.id'))
     results_id = db.Column(db.Integer, db.ForeignKey('results.id'))
-    results = db.relationship('ResultsSet', backref='owner', lazy='dynamic')
+
 
 
 class ResultsSet(db.Model):
@@ -67,7 +67,7 @@ class ResultsSet(db.Model):
     glu = db.Column(db.String(200))
     gal = db.Column(db.String(200))
     dp2split = db.Column(db.String(200))
-    experiment_id = db.Column(db.Integer, db.ForeignKey('experiment.id'))
+
 
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
@@ -76,6 +76,11 @@ manager.create_api(Enzyme, methods=['GET', 'POST', 'PUT', 'DELETE'])
 manager.create_api(Experiment, methods=['GET', 'POST', 'PUT', 'DELETE'])
 manager.create_api(Method, methods=['GET', 'POST', 'PUT', 'DELETE'])
 manager.create_api(ResultsSet, methods=['GET', 'POST', 'PUT', 'DELETE'])
+
+
+def choice_query():
+    return Enzyme.query
+
 
 
 class ExperimentForm(FlaskForm):
@@ -115,7 +120,7 @@ def create_exp():
         data['results'] = {'id': add_results(filename)}
         url = 'http://127.0.0.1:8080/api/experiment'
         method = {key: form.data[key] for key in form.data if key in ('temp', 'enz', 'lac', 'h2o', 'glu', 'desc')}
-        qs = Method.query.filter_by(temp=method['temp'], enzyme=method['enz'], lactose=method['lac'], 
+        qs = Method.query.filter_by(temp=method['temp'], enzyme=method['enz'], lactose=method['lac'],
                                     water=method['h2o'], glucose=method['glu'], description=method['desc']).first()
         if qs:
             data['method'] = {'id': qs.id}
