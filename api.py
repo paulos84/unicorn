@@ -22,11 +22,12 @@ app.config.from_object('config.DevelopmentConfig')
 db = SQLAlchemy(app)
 
 
+ # The parent in a one-to-one relationship with Experiment
 class Enzyme(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    enzyme = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
     dose = db.Column(db.Float(50), nullable=False)
-    experiments = db.relationship('Experiment', backref='owner', lazy='dynamic')
+    experiments = db.relationship('Experiment', backref='owner_enzyme', lazy='dynamic')
     """
     backref creates a virtual column in the class specified in the string so that by referencing e.g. experiment1.owner
     you can see who the owner is (the enzyme instance). lazy allows you to find out all the experiments that the Enzyme
@@ -41,7 +42,7 @@ class Method(db.Model):
     water = db.Column(db.Float(50), nullable=False)
     glucose = db.Column(db.Float(50))
     description = db.Column(db.String(800))
-    exp = db.relationship('Experiment', backref='conditions', lazy='dynamic')
+    experiments = db.relationship('Experiment', backref='owner_method', lazy='dynamic')
 
 
 #one-to-one relationship with results
@@ -53,6 +54,7 @@ class Experiment(db.Model):
     notes = db.Column(db.String(800))
     enzyme_id = db.Column(db.Integer, db.ForeignKey('enzyme.id'))
     method_id = db.Column(db.Integer, db.ForeignKey('method.id'))
+    results = db.relationship('ResultsSet', backref='owner', lazy='dynamic')
 
 
 class ResultsSet(db.Model):
@@ -64,7 +66,7 @@ class ResultsSet(db.Model):
     glu = db.Column(db.String(200))
     gal = db.Column(db.String(200))
     dp2split = db.Column(db.String(200))
-    experiment_id = db.Column(db.Integer, db.ForeignKey('results.id'))
+    experiment_id = db.Column(db.Integer, db.ForeignKey('experiment.id'))
 
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
