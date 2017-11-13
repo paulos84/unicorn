@@ -12,6 +12,8 @@ import pandas as pd
 
 # To Do - login password protection  - how to do with Flask-Restful/restless?
 # Use regex validators for form to ensure date format 2017-10-16
+# remove unused relationships?
+# produce schema on paper showing relationships
 
 
 app = Flask(__name__)
@@ -25,7 +27,6 @@ class Enzyme(db.Model):
     dose = db.Column(db.Float(50), nullable=False)
     experiments = db.relationship('Experiment', backref='owner_enzyme', lazy='dynamic')
 
-    
 class Method(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     temp = db.Column(db.Float(50), nullable=False)
@@ -77,7 +78,7 @@ class ExperimentForm(FlaskForm):
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
 
 
-@app.route('/api/create', methods=['GET', 'POST'])
+@app.route('/unicorn/create', methods=['GET', 'POST'])
 def create_exp():
     form = ExperimentForm()
     if form.validate_on_submit():
@@ -92,18 +93,25 @@ def create_exp():
         exp_data.update(results_dict)
         method_dict = {key: form.data[key] for key in form.data if key in
                        ('temp', 'lactose', 'water', 'glucose', 'description')}
-        enzyme = Enzyme.query.filter_by(name=enz_dict['name'], dose=enz_dict['dose']).first()
-        method = Method.query.filter_by(
-            temp=method_dict['temp'], lactose=method_dict['lactose'], water=method_dict['water'],
-            glucose=method_dict['glucose'], description=method_dict['description']).first()
-        if not enzyme:
-            enzyme = Enzyme(**enz_dict)
+
+        #method = Method.query.filter_by(
+        #    temp=method_dict['temp'], lactose=method_dict['lactose'], water=method_dict['water'],
+        #    glucose=method_dict['glucose'], description=method_dict['description']).first()
+        method = Method.query.filter_by(**method_dict).first()
         if not method:
             method = Method(**method_dict)
+        enzyme = Enzyme.query.filter_by(**enz_dict).first()
+        #        enzyme = Enzyme.query.filter_by(name=enz_dict['name'], dose=enz_dict['dose']).first()
+
+        if not enzyme:
+            enzyme = Enzyme(**enz_dict)
+
         exp = Experiment(**exp_data, owner_enzyme=enzyme, owner_method=method)
         db.session.add(exp)
         db.session.commit()
+
             # return a view of the exp data just entered, RESTLess route?
+        #else db.session.add each separately and then backref one in the other   --  see example from aurn-api
         return jsonify(exp_data)
     return render_template('exp_form.html', form=form)
 
