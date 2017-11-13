@@ -1,20 +1,15 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField, FloatField, DecimalField, SelectField, TextAreaField
+from wtforms import StringField, FloatField, SelectField, TextAreaField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, Regexp
 from werkzeug.utils import secure_filename
 from flask_restless import APIManager
 import pandas as pd
 
-
-
-# To Do - login password protection  - how to do with Flask-Restful/restless?
+# To Do:
 # Use regex validators for form to ensure date format 2017-10-16
-# remove unused relationships?
-# produce schema on paper showing relationships
-
 
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
@@ -89,30 +84,21 @@ def create_exp():
         df = pd.read_csv('uploads/{}'.format(filename))
         df.columns = df.columns.str.strip()
         labels = ['hours', 'dp3plus', 'dp2', 'glu', 'gal', 'dp2split']
-        results_dict = {a.strip(): [','.join([str(b) for b in df[a.strip()]])][0] for a in labels}
+        results_dict = {a: [','.join([str(b) for b in df[a.strip()]])][0] for a in labels}
         exp_data.update(results_dict)
         method_dict = {key: form.data[key] for key in form.data if key in
                        ('temp', 'lactose', 'water', 'glucose', 'description')}
-
-        #method = Method.query.filter_by(
-        #    temp=method_dict['temp'], lactose=method_dict['lactose'], water=method_dict['water'],
-        #    glucose=method_dict['glucose'], description=method_dict['description']).first()
         method = Method.query.filter_by(**method_dict).first()
         if not method:
             method = Method(**method_dict)
         enzyme = Enzyme.query.filter_by(**enz_dict).first()
-        #        enzyme = Enzyme.query.filter_by(name=enz_dict['name'], dose=enz_dict['dose']).first()
-
         if not enzyme:
             enzyme = Enzyme(**enz_dict)
-
         exp = Experiment(**exp_data, owner_enzyme=enzyme, owner_method=method)
         db.session.add(exp)
         db.session.commit()
-
-            # return a view of the exp data just entered, RESTLess route?
-        #else db.session.add each separately and then backref one in the other   --  see example from aurn-api
-        return jsonify(exp_data)
+        db.session.refresh(exp)
+        return redirect('http://127.0.0.1:8080/api/experiment/{}'.format(str(exp.id)))
     return render_template('exp_form.html', form=form)
 
 
