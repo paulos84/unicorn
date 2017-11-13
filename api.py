@@ -25,7 +25,7 @@ class Enzyme(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     dose = db.Column(db.Float(50), nullable=False)
-    experiments = db.relationship('Experiment', backref='enzyme', lazy='dynamic')
+    experiments = db.relationship('Experiment', backref='owner_enzyme', lazy='dynamic')
 
 class Method(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -34,7 +34,7 @@ class Method(db.Model):
     water = db.Column(db.Float(50), nullable=False)
     glucose = db.Column(db.Float(50))
     description = db.Column(db.String(500))
-    experiments = db.relationship('Experiment', backref='method', lazy='dynamic')
+    experiments = db.relationship('Experiment', backref='owner_method', lazy='dynamic')
 """
   backref creates a virtual column in the class specified in the string so that by referencing e.g. experiment1.owner
   you can see who the owner is (the enzyme instance). lazy allows you to find out all the experiments that the Enzyme
@@ -58,14 +58,11 @@ class Experiment(db.Model):
     method_id = db.Column(db.Integer, db.ForeignKey('method.id'))
 
 
-
 manager = APIManager(app, flask_sqlalchemy_db=db)
 # default endpoint: 127.0.0.1:8080/api/experiment
 manager.create_api(Enzyme, methods=['GET', 'POST', 'PUT', 'DELETE'])
 manager.create_api(Method, methods=['GET', 'POST', 'PUT', 'DELETE'])
 manager.create_api(Experiment, methods=['GET', 'POST', 'PUT', 'DELETE'])
-
-
 
 
 class ExperimentForm(FlaskForm):
@@ -87,21 +84,25 @@ class ExperimentForm(FlaskForm):
 def create_exp():
     form = ExperimentForm()
     if form.validate_on_submit():
-        exp_data = {key: form.data[key] for key in form.data if key in ('name', 'date', 'notes', 'enz_name', 'enz_dose')}
+        exp_data = {key: form.data[key] for key in form.data if key in ('name', 'date', 'notes')}
+        enz_dict = {key: form.data[key] for key in form.data if key in ('enz_name', 'enz_dose')}
         filename = exp_data['name'] + '_results_' + secure_filename(form.file.data.filename)
         form.file.data.save('uploads/' + filename)
         df = pd.read_csv('uploads/{}'.format(filename))
         df.columns = df.columns.str.strip()
         labels = ['hours', 'dp3plus', 'dp2', 'glu', 'gal', 'dp2split']
         results_dict = {a.strip(): [','.join([str(b) for b in df[a.strip()]])][0] for a in labels}
-        #db.session.add(results)
-        method = {key: form.data[key] for key in form.data if key in ('temp', 'lac', 'h2o', 'glu', 'desc')}
-        method_query = Method.query.filter_by(temp=method['temp'], lactose=method['lac'],
-                                    water=method['h2o'], glucose=method['glu'], description=method['desc']).first()
-        enzyme_query = Enzyme.query.filter_by(name=exp_data['enz_name'], dose=exp_data['enz_dose'])
-        
-        if method_query:
+        exp_data.update(results_dict)
+        method_dict = {key: form.data[key] for key in form.data if key in ('temp', 'lac', 'h2o', 'glu', 'desc')}
+        method = Method.query.filter_by(
+            temp=method_dict['temp'], lactose=method_dict['lac'], water=method_dict['h2o'], glucose=method_dict['glu'],
+            description=method_dict['desc']).first()
+        enzyme = Enzyme.query.filter_by(name=enz_dict['enz_name'], dose=enz_dict['enz_dose'])
+        if method_query and enzyme_query:
+            #do not need to create new db entry from method and enzyme, just reference the method_query and enz_
+            exp = Experiment(**exp_data, owner_enzyme=enzyme, owner_method=method)
             #db.add with backref to parent method
+            #       exp = Experiment(**exp_data.update())
             return jsonify(exp_data)
             # return a view of the exp data just entered, RESTLess route?
         #else db.session.add each separately and then backref one in the other   --  see example from aurn-api
