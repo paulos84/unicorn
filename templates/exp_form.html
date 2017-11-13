@@ -12,12 +12,27 @@
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
-        	    {{ render_field(form.date) }}
+            {{ render_field(form.date) }}
          <ul>
             {% for error in form.date.errors %}
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
+
+                    {{ render_field(form.enz_name) }}
+         <ul>
+            {% for error in form.enz_name.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+
+                    {{ render_field(form.enz_dose) }}
+         <ul>
+            {% for error in form.enz_dose.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+
         {{ render_field(form.notes) }}
 		<ul>
             {% for error in form.notes.errors %}
@@ -30,15 +45,31 @@
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
-        {{ render_field(form.enz_dose) }}
+
+        {{ render_field(form.lactose) }}
             		<ul>
-            {% for error in form.enz_dose.errors %}
+            {% for error in form.lactose.errors %}
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
-                {{ render_field(form.misc) }}
+         </ul>
+        {{ render_field(form.water) }}
             		<ul>
-            {% for error in form.misc.errors %}
+            {% for error in form.water.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+         </ul>
+        {{ render_field(form.glucose) }}
+            		<ul>
+            {% for error in form.glucose.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+
+                {{ render_field(form.description) }}
+            		<ul>
+            {% for error in form.description.errors %}
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
