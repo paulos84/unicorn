@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField, FloatField, SelectField
+from wtforms import StringField, FloatField, DecimalField, SelectField, TextAreaField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import InputRequired
 from werkzeug.utils import secure_filename
@@ -19,9 +19,6 @@ import pandas as pd
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
 db = SQLAlchemy(app)
-
-
-
 
 
 class Method(db.Model):
@@ -75,16 +72,16 @@ manager.create_api(ResultSet, methods=['GET', 'POST', 'PUT', 'DELETE'])
 class ExperimentForm(FlaskForm):
     name = StringField('Experiment name', default='Exp', validators=[InputRequired('Experiment name is required')])
     date = StringField('Date of experiment', validators=[InputRequired('Date format e.g. 2017-10-01')])
-    notes = StringField('Notes on aim, summary etc.')
-    enz_name = SelectField(choices=['white unicorn', 'GC288', 'GODO YNL-2'])
+    notes = TextAreaField('Notes on aim, summary etc.')
+    enz_name = SelectField(choices=[('White unicorn', 'white unicorn'), ('gc288', 'GC288'), ('godo', 'GODO YNL-2')],
+                           validators=[InputRequired('Enzyme name required')])
     enz_dose = FloatField('Enzyme dose (mg/g)', validators=[InputRequired('Enzyme dose required')])
     temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required')])
     lac = FloatField('Lactose monohydrate (g)', default='404', validators=[InputRequired('Lactose amount required')])
     h2o = FloatField('Water (g)', default='225.6', validators=[InputRequired('Water amount required')])
     glu = FloatField('Glucose (g)', default=0)
-    desc = StringField('Notes on experiment procedure')
+    desc = TextAreaField('Notes on experiment procedure')
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
-
 
 
 @app.route('/api/create', methods=['GET', 'POST'])
@@ -107,7 +104,7 @@ def create_exp():
         if qs:
             #db.add with backref to parent method
             return jsonify(exp_data)
-            # return a view of the exp data just entered, RESTLess route? 
+            # return a view of the exp data just entered, RESTLess route?
         #else db.session.add each separately and then backref one in the other   --  see example from aurn-api
         return jsonify(exp_data)
     return render_template('exp_form.html', form=form)
