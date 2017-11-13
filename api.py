@@ -12,8 +12,6 @@ import pandas as pd
 
 # To Do - login password protection  - how to do with Flask-Restful/restless?
 # Use regex validators for form to ensure date format 2017-10-16
-# remove unused relationships?
-# produce schema on paper showing relationships
 
 
 app = Flask(__name__)
@@ -27,6 +25,7 @@ class Enzyme(db.Model):
     dose = db.Column(db.Float(50), nullable=False)
     experiments = db.relationship('Experiment', backref='owner_enzyme', lazy='dynamic')
 
+    
 class Method(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     temp = db.Column(db.Float(50), nullable=False)
@@ -104,9 +103,7 @@ def create_exp():
         exp = Experiment(**exp_data, owner_enzyme=enzyme, owner_method=method)
         db.session.add(exp)
         db.session.commit()
-
             # return a view of the exp data just entered, RESTLess route?
-        #else db.session.add each separately and then backref one in the other   --  see example from aurn-api
         return jsonify(exp_data)
     return render_template('exp_form.html', form=form)
 
