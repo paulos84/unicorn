@@ -45,8 +45,6 @@ class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     date = db.Column(db.String(50), nullable=False)
-    enz_name = db.Column(db.String(50), nullable=False)
-    enz_dose = db.Column(db.Float(50), nullable=False)
     notes = db.Column(db.String(800))
     hours = db.Column(db.String(200))
     dp3plus = db.Column(db.String(200))
@@ -73,10 +71,10 @@ class ExperimentForm(FlaskForm):
                            validators=[InputRequired('Enzyme name required')])
     enz_dose = FloatField('Enzyme dose (mg/g)', validators=[InputRequired('Enzyme dose required')])
     temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required')])
-    lac = FloatField('Lactose monohydrate (g)', default='404', validators=[InputRequired('Lactose amount required')])
-    h2o = FloatField('Water (g)', default='225.6', validators=[InputRequired('Water amount required')])
-    glu = FloatField('Glucose (g)')
-    desc = TextAreaField('Notes on experiment procedure')
+    lactose = FloatField('Lactose monohydrate (g)', default=404, validators=[InputRequired('Lactose amount required')])
+    water = FloatField('Water (g)', default=225.6, validators=[InputRequired('Water amount required')])
+    glucose = FloatField('Glucose (g)', default=0)
+    description = TextAreaField('Notes on experiment procedure')
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
 
 
@@ -85,7 +83,7 @@ def create_exp():
     form = ExperimentForm()
     if form.validate_on_submit():
         exp_data = {key: form.data[key] for key in form.data if key in ('name', 'date', 'notes')}
-        enz_dict = {key: form.data[key] for key in form.data if key in ('enz_name', 'enz_dose')}
+        enz_dict = {'name': form.data['enz_name'], 'dose': form.data['enz_dose']}
         filename = exp_data['name'] + '_results_' + secure_filename(form.file.data.filename)
         form.file.data.save('uploads/' + filename)
         df = pd.read_csv('uploads/{}'.format(filename))
@@ -93,17 +91,20 @@ def create_exp():
         labels = ['hours', 'dp3plus', 'dp2', 'glu', 'gal', 'dp2split']
         results_dict = {a.strip(): [','.join([str(b) for b in df[a.strip()]])][0] for a in labels}
         exp_data.update(results_dict)
-        method_dict = {key: form.data[key] for key in form.data if key in ('temp', 'lac', 'h2o', 'glu', 'desc')}
+        method_dict = {key: form.data[key] for key in form.data if key in
+                       ('temp', 'lactose', 'water', 'glucose', 'description')}
+        enzyme = Enzyme.query.filter_by(name=enz_dict['name'], dose=enz_dict['dose']).first()
         method = Method.query.filter_by(
-            temp=method_dict['temp'], lactose=method_dict['lac'], water=method_dict['h2o'], glucose=method_dict['glu'],
-            description=method_dict['desc']).first()
-        enzyme = Enzyme.query.filter_by(name=enz_dict['enz_name'], dose=enz_dict['enz_dose'])
-        if method_query and enzyme_query:
-            #do not need to create new db entry from method and enzyme, just reference the method_query and enz_
-            exp = Experiment(**exp_data, owner_enzyme=enzyme, owner_method=method)
-            #db.add with backref to parent method
-            #       exp = Experiment(**exp_data.update())
-            return jsonify(exp_data)
+            temp=method_dict['temp'], lactose=method_dict['lactose'], water=method_dict['water'],
+            glucose=method_dict['glucose'], description=method_dict['description']).first()
+        if not enzyme:
+            enzyme = Enzyme(**enz_dict)
+        if not method:
+            method = Method(**method_dict)
+        exp = Experiment(**exp_data, owner_enzyme=enzyme, owner_method=method)
+        db.session.add(exp)
+        db.session.commit()
+
             # return a view of the exp data just entered, RESTLess route?
         #else db.session.add each separately and then backref one in the other   --  see example from aurn-api
         return jsonify(exp_data)
