@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField, SelectField, TextAreaField
@@ -10,6 +10,8 @@ import pandas as pd
 
 # To Do:
 # Use regex validators for form to ensure date format 2017-10-16
+#[0-9]{4}[-][0-9]{2}[-]{1}[0-9]{2}{1}
+# use http basic authentication
 
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
@@ -53,9 +55,9 @@ class Experiment(db.Model):
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
 # default endpoint: 127.0.0.1:8080/api/experiment
-manager.create_api(Enzyme, methods=['GET', 'POST', 'PUT', 'DELETE'])
-manager.create_api(Method, methods=['GET', 'POST', 'PUT', 'DELETE'])
-manager.create_api(Experiment, methods=['GET', 'POST', 'PUT', 'DELETE'])
+manager.create_api(Enzyme, methods=['GET'])
+manager.create_api(Method, methods=['GET'])
+manager.create_api(Experiment, methods=['GET'])
 
 
 class ExperimentForm(FlaskForm):
