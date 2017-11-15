@@ -1,5 +1,6 @@
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField, SelectField, TextAreaField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
@@ -10,13 +11,22 @@ import pandas as pd
 
 # To Do:
 # Use regex validators for form to ensure date format 2017-10-16
-#[0-9]{4}[-][0-9]{2}[-]{1}[0-9]{2}{1}
-# use http basic authentication
+# Ensure exp name unique?
+# Flask-Login
 
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
 db = SQLAlchemy(app)
 
+"""
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=False)
+"""
 
 class Enzyme(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -53,16 +63,38 @@ class Experiment(db.Model):
     method_id = db.Column(db.Integer, db.ForeignKey('method.id'))
 
 
+"""
+#this function allows flask_login to connects a User instance with a user that flask_login handles
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
+@app.route('/')
+def index():
+    # in a real example, would usually authenticate user before the following
+    user = User.query.filter_by(username='admin').first()
+    login_user(user)
+    return 'You are now logged in'
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return 'You are now logged out!'
+"""
+
 manager = APIManager(app, flask_sqlalchemy_db=db)
 # default endpoint: 127.0.0.1:8080/api/experiment
-manager.create_api(Enzyme, methods=['GET'])
-manager.create_api(Method, methods=['GET'])
-manager.create_api(Experiment, methods=['GET'])
+manager.create_api(Enzyme, methods=['GET', 'POST', 'PUT', 'DELETE'])
+manager.create_api(Method, methods=['GET', 'POST', 'PUT', 'DELETE'])
+manager.create_api(Experiment, methods=['GET', 'POST', 'PUT', 'DELETE'])
 
 
 class ExperimentForm(FlaskForm):
     name = StringField('Experiment name', default='Exp', validators=[InputRequired('Experiment name is required')])
-    date = StringField('Date of experiment', validators=[InputRequired('Date format e.g. 2017-10-01')])
+    date = StringField('Date of experiment', validators=[InputRequired(), Regexp(r"[0-9]{4}[-]{1}[0-9]{2}[-]{1}[0-9]{2}")])
     notes = TextAreaField('Notes on aim, summary etc.')
     enz_name = SelectField(choices=[('wu', 'White unicorn'), ('gc288', 'GC288'), ('godo', 'GODO YNL-2')],
                            validators=[InputRequired('Enzyme name required')])
