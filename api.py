@@ -59,10 +59,11 @@ def check_credentials(**kwargs):
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
 # default endpoint: 127.0.0.1:8080/api/experiment
-manager.create_api(Enzyme, methods=['GET', 'POST', 'PUT', 'DELETE'])
-manager.create_api(Method, methods=['GET', 'POST', 'PUT', 'DELETE'])
-manager.create_api(Experiment, methods=['GET', 'POST', 'PUT', 'DELETE'],
-                   preprocessors={'POST': [check_credentials], 'DELETE_SINGLE': [check_credentials]})
+http_methods = ['GET', 'POST', 'PUT', 'DELETE']
+protected = ['GET_SINGLE', 'POST', 'PUT_SINGLE', 'DELETE_SINGLE']
+manager.create_api(Enzyme, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
+manager.create_api(Method, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
+manager.create_api(Experiment, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
 
 
 class ExperimentForm(FlaskForm):
@@ -84,7 +85,7 @@ class ExperimentForm(FlaskForm):
 
 @app.route('/unicorn/create', methods=['GET', 'POST'])
 def create_exp():
-    if request.authorization and request.authorization.username == 'admin' and request.authorization.password == 'mermaid':
+    if request.authorization and request.authorization.username == 'admin' and request.authorization.password == 'kong':
         form = ExperimentForm()
         if form.validate_on_submit():
             exp_data = {key: form.data[key] for key in form.data if key in ('name', 'date', 'notes')}
