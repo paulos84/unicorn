@@ -5,7 +5,7 @@ from wtforms import StringField, FloatField, SelectField, TextAreaField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import InputRequired, Regexp
 from werkzeug.utils import secure_filename
-from flask_restless import APIManager
+from flask_restless import APIManager, ProcessingException
 import pandas as pd
 
 
@@ -30,13 +30,11 @@ class Method(db.Model):
     description = db.Column(db.String(500))
     experiments = db.relationship('Experiment', backref='owner_method', lazy='dynamic')
 
-
 """
   backref creates a virtual column in the class specified in the string so that by referencing e.g. experiment1.owner
   you can see who the owner is (the enzyme instance). lazy allows you to find out all the experiments that the Enzyme
   instance has e.g. by running the query: [i.name for i in enzyme1.experiments.all()]
 """
-
 
 class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -53,11 +51,18 @@ class Experiment(db.Model):
     method_id = db.Column(db.Integer, db.ForeignKey('method.id'))
 
 
+access_password = 'mysecretkey'
+
+def check_credentials(**kwargs):
+    if request.headers.get('X-Secret-Key', '') != access_password:
+        raise ProcessingException(code=401)  # Unauthorized
+
 manager = APIManager(app, flask_sqlalchemy_db=db)
 # default endpoint: 127.0.0.1:8080/api/experiment
 manager.create_api(Enzyme, methods=['GET', 'POST', 'PUT', 'DELETE'])
 manager.create_api(Method, methods=['GET', 'POST', 'PUT', 'DELETE'])
-manager.create_api(Experiment, methods=['GET', 'POST', 'PUT', 'DELETE'])
+manager.create_api(Experiment, methods=['GET', 'POST', 'PUT', 'DELETE'],
+                   preprocessors={'POST': [check_credentials], 'DELETE_SINGLE': [check_credentials]})
 
 
 class ExperimentForm(FlaskForm):
@@ -79,7 +84,7 @@ class ExperimentForm(FlaskForm):
 
 @app.route('/unicorn/create', methods=['GET', 'POST'])
 def create_exp():
-    if request.authorization and request.authorization.username == 'admin' and request.authorization.password == 'gordongodo':
+    if request.authorization and request.authorization.username == 'admin' and request.authorization.password == 'mermaid':
         form = ExperimentForm()
         if form.validate_on_submit():
             exp_data = {key: form.data[key] for key in form.data if key in ('name', 'date', 'notes')}
