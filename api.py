@@ -58,6 +58,7 @@ def check_credentials(**kwargs):
         raise ProcessingException(code=401)  # Unauthorized
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
+
 # default endpoint: 127.0.0.1:8080/api/experiment
 http_methods = ['GET', 'POST', 'PUT', 'DELETE']
 protected = ['GET_SINGLE', 'POST', 'PUT_SINGLE', 'DELETE_SINGLE']
@@ -112,6 +113,19 @@ def create_exp():
             return redirect('http://127.0.0.1:8080/api/experiment/{}'.format(str(exp.id)))
         return render_template('exp_form.html', form=form)
     return make_response('Could not verify!', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+
+@app.route('/unicorn/plot/<int:exp_id>')
+def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
+    exp = Experiment.query.filter_by(id=exp_id).first()
+    chart = {"renderTo": chart_id, "type": chart_type, "height": chart_height, "width": chart_width}
+    series = [{"name": '', "data": a_list}, {"name": '', "data": a_list},
+              {"name": '', "data": a_list}]
+    title = {"text": 'Experiment_id: {}. Conditions:...'.format(exp_id)}
+    xaxis = {"categories": a_list}
+    yaxis = {"title": {"text": '%'}}
+    return render_template('detail.html', chartID=chart_id, chart=chart, series=series, title=title, xAxis=xaxis, 
+                           yAxis=yaxis)
 
 
 if __name__ == '__main__':
