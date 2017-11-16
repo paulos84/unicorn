@@ -114,17 +114,16 @@ def create_exp():
         return render_template('exp_form.html', form=form)
     return make_response('Could not verify!', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
-
-@app.route('/unicorn/plot/<int:exp_id>')
-def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
-    exp = Experiment.query.filter_by(id=exp_id).first()
+#/<int:exp_id>
+@app.route('/unicorn/plot')
+def plot(chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
+    #exp = Experiment.query.filter_by(id=exp_id).first()
     chart = {"renderTo": chart_id, "type": chart_type, "height": chart_height, "width": chart_width}
-    series = [{"name": '', "data": a_list}, {"name": '', "data": a_list},
-              {"name": '', "data": a_list}]
-    title = {"text": 'Experiment_id: {}. Conditions:...'.format(exp_id)}
-    xaxis = {"categories": a_list}
+    series = [{"name": 'GOS', "data": [3,2,3,4]}, {"name": 'dp3+', "data": [2,6,5,7]}]
+    title = {"text": 'Experiment_id: {}. Conditions:...'.format('foo')}
+    xaxis = {"categories": [1,2,3,4]}
     yaxis = {"title": {"text": '%'}}
-    return render_template('detail.html', chartID=chart_id, chart=chart, series=series, title=title, xAxis=xaxis, 
+    return render_template('chart.html', chartID=chart_id, chart=chart, series=series, title=title, xAxis=xaxis,
                            yAxis=yaxis)
 
 
