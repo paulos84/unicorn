@@ -8,7 +8,7 @@ import pandas as pd
 from .models import Enzyme, Experiment, Method, db
 
 
-create_exp = Blueprint('create_exp', __name__)
+exp_form = Blueprint('exp_form', __name__)
 
 
 class ExperimentForm(FlaskForm):
@@ -28,7 +28,7 @@ class ExperimentForm(FlaskForm):
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
 
 
-@create_exp.route('/unicorn/create', methods=['GET', 'POST'])
+@exp_form.route('/unicorn/create', methods=['GET', 'POST'])
 def create_exp():
     if request.authorization and request.authorization.username == 'admin' and request.authorization.password == 'kong':
         form = ExperimentForm()
