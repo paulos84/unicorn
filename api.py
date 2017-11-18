@@ -78,7 +78,7 @@ class ExperimentForm(FlaskForm):
     description = TextAreaField('Notes on experiment procedure')
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
 
-@app.route('/unicorn/create', methods=['GET', 'POST'])
+@app.route('/create', methods=['GET', 'POST'])
 def create_exp():
     if request.authorization and request.authorization.username == 'admin' and request.authorization.password == 'kong':
         form = ExperimentForm()
@@ -109,7 +109,7 @@ def create_exp():
     return make_response('Could not verify!', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
-@app.route('/unicorn/<exp_id>')
+@app.route('/results/<exp_id>')
 def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
     exp = Experiment.query.filter_by(id=int(exp_id)).first()
     chart = {"renderTo": chart_id, "type": chart_type, "height": chart_height, "width": chart_width}
