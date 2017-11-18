@@ -55,7 +55,6 @@ def check_credentials(**kwargs):
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
 
-
 http_methods = ['GET', 'POST', 'PUT', 'DELETE']
 protected = ['POST', 'PUT_SINGLE', 'PUT MANY', 'DELETE_SINGLE', 'DELETE_MANY']
 manager.create_api(Enzyme, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
@@ -106,8 +105,7 @@ def create_exp():
             db.session.refresh(exp)
             return redirect('http://127.0.0.1:8080/api/experiment/{}'.format(str(exp.id)))
         return render_template('exp_form.html', form=form)
-    return make_response('Could not verify!', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
-
+    return make_response('Unable to verify', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 @app.route('/results/<exp_id>')
 def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
