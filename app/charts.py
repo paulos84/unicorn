@@ -1,6 +1,5 @@
 from flask import render_template, Blueprint
 
-
 charts = Blueprint('charts', __name__)
 
 @charts.route('/unicorn/plot')

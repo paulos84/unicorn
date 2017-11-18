@@ -3,6 +3,7 @@ A database and API created for white unicorn enzyme reaction trials.
 
 The API gives access to the database. It follows REST design principles, providing data in JSON format through endpoints detailed as follows.
 
+default endpoint: 127.0.0.1:8080/api/experiment
 
 Install
 -------
