@@ -109,9 +109,9 @@ def create_exp():
     return make_response('Could not verify!', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
-@app.route('/unicorn/plot')
-def plot(exp_id=1, chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
-    exp = Experiment.query.filter_by(id=exp_id).first()
+@app.route('/unicorn/<exp_id>')
+def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
+    exp = Experiment.query.filter_by(id=int(exp_id)).first()
     chart = {"renderTo": chart_id, "type": chart_type, "height": chart_height, "width": chart_width}
     series = [{"name": 'DP2', "data": [float(a) for a in exp.dp2.split(',')]},
              {"name": 'DP3+', "data": [float(a) for a in exp.dp3plus.split(',')]}]
