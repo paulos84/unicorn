@@ -113,9 +113,9 @@ def create_exp():
 def plot(exp_id=1, chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
     exp = Experiment.query.filter_by(id=exp_id).first()
     chart = {"renderTo": chart_id, "type": chart_type, "height": chart_height, "width": chart_width}
-    series = [{"name": 'DP2', "data": exp.dp2.split(',')}, {"name": 'DP3+', "data": exp.dp3plus.split(',')}]
-    [{"name": 'PM10', "data": data_dict['pm1']}, {"name": 'PM2.5', "data": data_dict['pm2']},
-                  {"name": 'Nitrogen Dioxide', "data": data_dict['no2']}]title = {"text": 'Experiment_id: {}. Conditions:...'.format('foo')}
+    series = [{"name": 'DP2', "data": [float(a) for a in exp.dp2.split(',')]},
+             {"name": 'DP3+', "data": [float(a) for a in exp.dp3plus.split(',')]}]
+    title = {"text": 'Experiment_id: {}. Conditions:...'.format('foo')}
     xaxis = {"categories": exp.hours.split(',')}
     yaxis = {"title": {"text": '%'}}
     return render_template('chart.html', chartID=chart_id, chart=chart, series=series, title=title, xAxis=xaxis,
