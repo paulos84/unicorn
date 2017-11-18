@@ -4,10 +4,13 @@ It provides an API to allow the database to be queried as well as updated, To re
 
 ...Charts
 
+default endpoint: 127.0.0.1:8080/api/experiment
+
 Clone this repo to your local machine. In the top level directory, create a virtual environment:
 
     $ virtualenv flask-aws
     $ source flask-aws/bin/activate
+    -see example http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-flask.html
 
 Now install the required modules:
  
