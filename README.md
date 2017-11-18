@@ -1,26 +1,17 @@
-A database and API created for white unicorn enzyme reaction trials.  
+An application created for recording and reviewing data from trials on galacto-oligosaccharide production using an enzyme labelled 'white unicorn'.
 
+It provides an API to allow the database to be queried as well as updated, To record data in the database, the application provides html forms for recording experiment details along with a field allowing csv files of results to be uploaded. The API allows the database to be queried and updated/edited. The API follows RESTful design principles, providing data in JSON format through endpoints detailed as follows....
 
-The API gives access to the database. It follows REST design principles, providing data in JSON format through endpoints detailed as follows.
+...Charts
 
-default endpoint: 127.0.0.1:8080/api/experiment
+Clone this repo to your local machine. In the top level directory, create a virtual environment:
 
-Install
--------
+    $ virtualenv flask-aws
+    $ source flask-aws/bin/activate
 
- - Python 3
-
-   - https://www.python.org
-
- - PIP (Python package manager)
-
-   - https://pypi.python.org/pypi/pip
-      
-After cloning the repository, run the following commands from the project's root directory:
-
-    pip install --upgrade pip
-
-    pip install -r requirements.txt
+Now install the required modules:
+ 
+    $ pip install -r requirements.txt
     
 
 Create and populate database

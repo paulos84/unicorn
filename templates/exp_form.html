@@ -1,76 +1,80 @@
 {% from "_render_field.html" import render_field %}
-
 <html>
-	<head>
-		<title>Experiment form</title>
-	</head>
-	<body>
-		<form method="POST" action="{{url_for('exp_form.create_exp') }}" enctype="multipart/form-data">
+<head>
+<title>Create Experiment</title>
+</head>
+<body>
+	<form method="POST" action="{{url_for('create_exp') }}" enctype="multipart/form-data">
 	    {{ form.csrf_token }}
 	    {{ render_field(form.name) }}
-			<ul>
+	    <ul>
             {% for error in form.name.errors %}
-				<li style="color:red;">{{ error }}</li>
+            <li style="color:red;">{{ error }}</li>
             {% endfor %}
-			</ul>
+        </ul>
             {{ render_field(form.date) }}
-			<ul>
+         <ul>
             {% for error in form.date.errors %}
-				<li style="color:red;">{{ error }}</li>
+            <li style="color:red;">{{ error }}</li>
             {% endfor %}
-			</ul>
+        </ul>
+
                     {{ render_field(form.enz_name) }}
-			<ul>
+         <ul>
             {% for error in form.enz_name.errors %}
-				<li style="color:red;">{{ error }}</li>
+            <li style="color:red;">{{ error }}</li>
             {% endfor %}
-			</ul>
+        </ul>
+
                     {{ render_field(form.enz_dose) }}
-			<ul>
+         <ul>
             {% for error in form.enz_dose.errors %}
-				<li style="color:red;">{{ error }}</li>
+            <li style="color:red;">{{ error }}</li>
             {% endfor %}
-			</ul>
+        </ul>
+
         {{ render_field(form.notes) }}
-			<ul>
-            {% for error in form.notes.errors %}
-				<li style="color:red;">{{ error }}</li>
-            {% endfor %}
-			</ul>
-            {{ render_field(form.temp) }}
-			<ul>
-            {% for error in form.temp.errors %}
-				<li style="color:red;">{{ error }}</li>
-            {% endfor %}
-			</ul>
-        {{ render_field(form.lactose) }}
-			<ul>
-            {% for error in form.lactose.errors %}
-				<li style="color:red;">{{ error }}</li>
-            {% endfor %}
-			</ul>
-		</ul>
-        {{ render_field(form.water) }}
 		<ul>
+            {% for error in form.notes.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+            {{ render_field(form.temp) }}
+            		<ul>
+            {% for error in form.temp.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+
+        {{ render_field(form.lactose) }}
+            		<ul>
+            {% for error in form.lactose.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+         </ul>
+        {{ render_field(form.water) }}
+            		<ul>
             {% for error in form.water.errors %}
-			<li style="color:red;">{{ error }}</li>
+            <li style="color:red;">{{ error }}</li>
             {% endfor %}
-		</ul>
-	</ul>
+        </ul>
+         </ul>
         {{ render_field(form.glucose) }}
-	<ul>
+            		<ul>
             {% for error in form.glucose.errors %}
-		<li style="color:red;">{{ error }}</li>
+            <li style="color:red;">{{ error }}</li>
             {% endfor %}
-	</ul>
+        </ul>
+
                 {{ render_field(form.description) }}
-	<ul>
+            		<ul>
             {% for error in form.description.errors %}
-		<li style="color:red;">{{ error }}</li>
+            <li style="color:red;">{{ error }}</li>
             {% endfor %}
-	</ul>
+        </ul>
             {{ render_field(form.file) }}
-	<input type="submit" value="Submit">
+	    <input type="submit" value="Submit">
 	</form>
 </body>
 </html>
