@@ -57,7 +57,7 @@ manager = APIManager(app, flask_sqlalchemy_db=db)
 
 
 http_methods = ['GET', 'POST', 'PUT', 'DELETE']
-protected = ['GET_SINGLE', 'POST', 'PUT_SINGLE', 'DELETE_SINGLE']
+protected = ['POST', 'PUT_SINGLE', 'PUT MANY', 'DELETE_SINGLE', 'DELETE_MANY']
 manager.create_api(Enzyme, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
 manager.create_api(Method, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
 manager.create_api(Experiment, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
@@ -110,12 +110,13 @@ def create_exp():
 
 
 @app.route('/unicorn/plot')
-def plot(chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
-    #exp = Experiment.query.filter_by(id=exp_id).first()
+def plot(exp_id=1, chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
+    exp = Experiment.query.filter_by(id=exp_id).first()
     chart = {"renderTo": chart_id, "type": chart_type, "height": chart_height, "width": chart_width}
-    series = [{"name": 'GOS', "data": [3,2,3,4]}, {"name": 'dp3+', "data": [2,6,5,7]}]
-    title = {"text": 'Experiment_id: {}. Conditions:...'.format('foo')}
-    xaxis = {"categories": [1,2,3,4]}
+    series = [{"name": 'DP2', "data": exp.dp2.split(',')}, {"name": 'DP3+', "data": exp.dp3plus.split(',')}]
+    [{"name": 'PM10', "data": data_dict['pm1']}, {"name": 'PM2.5', "data": data_dict['pm2']},
+                  {"name": 'Nitrogen Dioxide', "data": data_dict['no2']}]title = {"text": 'Experiment_id: {}. Conditions:...'.format('foo')}
+    xaxis = {"categories": exp.hours.split(',')}
     yaxis = {"title": {"text": '%'}}
     return render_template('chart.html', chartID=chart_id, chart=chart, series=series, title=title, xAxis=xaxis,
                            yAxis=yaxis)
