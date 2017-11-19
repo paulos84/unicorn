@@ -77,7 +77,7 @@ class ExperimentForm(FlaskForm):
     lactose = FloatField('Lactose monohydrate (g)', default=404, validators=[InputRequired('Lactose amount required')])
     water = FloatField('Water (g)', default=225.6, validators=[InputRequired('Water amount required')])
     glucose = FloatField('Glucose (g)', default=0)
-    description = TextAreaField('Notes on experiment procedure')
+    procedure_notes = TextAreaField('Notes on experiment procedure')
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
 
 @app.route('/create', methods=['GET', 'POST'])
@@ -85,7 +85,7 @@ def create_exp():
     if request.authorization and request.authorization.username == 'admin' and request.authorization.password == 'kong':
         form = ExperimentForm()
         if form.validate_on_submit():
-            exp_data = {key: form.data[key] for key in form.data if key in ('name', 'date', 'notes', 'description')}
+            exp_data = {key: form.data[key] for key in form.data if key in ('name', 'date', 'notes', 'procedure_notes')}
             enz_dict = {'name': form.data['enz_name'], 'dose': form.data['enz_dose']}
             filename = exp_data['name'] + '_results_' + secure_filename(form.file.data.filename)
             form.file.data.save('uploads/' + filename)

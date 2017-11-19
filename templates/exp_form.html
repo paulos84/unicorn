@@ -69,9 +69,9 @@
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
-                {{ render_field(form.description) }}
+                {{ render_field(form.procedure_notes) }}
             		<ul>
-            {% for error in form.description.errors %}
+            {% for error in form.procedure_notes.errors %}
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
