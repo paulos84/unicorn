@@ -95,7 +95,7 @@ def create_exp():
             results_dict = {a: [','.join([str(b) for b in df[a.strip()]])][0] for a in labels}
             exp_data.update(results_dict)
             conditions_dict = {key: form.data[key] for key in form.data if key in
-                           ('temp', 'pH, ''lactose', 'water', 'glucose')}
+                           ('temp', 'pH', 'lactose', 'water', 'glucose')}
             conditions = ConditionsSet.query.filter_by(**conditions_dict).first()
             if not conditions:
                 conditions = ConditionsSet(**conditions_dict)
