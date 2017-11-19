@@ -19,6 +19,7 @@ class Enzyme(db.Model):
     experiments = db.relationship('Experiment', backref='owner_enzyme', lazy='dynamic')
 
 class ConditionsSet(db.Model):
+    __tablename__ = 'conditions'
     id = db.Column(db.Integer, primary_key=True)
     temp = db.Column(db.Float(50), nullable=False)
     pH = db.Column(db.Float(10))
@@ -46,7 +47,7 @@ class Experiment(db.Model):
     gal = db.Column(db.String(200))
     dp2split = db.Column(db.String(200))
     enzyme_id = db.Column(db.Integer, db.ForeignKey('enzyme.id'))
-    conditions_id = db.Column(db.Integer, db.ForeignKey('ConditionsSet.id'))
+    conditions_id = db.Column(db.Integer, db.ForeignKey('conditions.id'))
 
 access_password = 'mysecretkey'
 
@@ -72,6 +73,7 @@ class ExperimentForm(FlaskForm):
                            validators=[InputRequired('Enzyme name required')])
     enz_dose = FloatField('Enzyme dose (mg/g)', validators=[InputRequired('Enzyme dose required')])
     temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required')])
+    pH = FloatField('Glucose (g)', default=None)
     lactose = FloatField('Lactose monohydrate (g)', default=404, validators=[InputRequired('Lactose amount required')])
     water = FloatField('Water (g)', default=225.6, validators=[InputRequired('Water amount required')])
     glucose = FloatField('Glucose (g)', default=0)
@@ -83,7 +85,7 @@ def create_exp():
     if request.authorization and request.authorization.username == 'admin' and request.authorization.password == 'kong':
         form = ExperimentForm()
         if form.validate_on_submit():
-            exp_data = {key: form.data[key] for key in form.data if key in ('name', 'date', 'notes')}
+            exp_data = {key: form.data[key] for key in form.data if key in ('name', 'date', 'notes', 'description')}
             enz_dict = {'name': form.data['enz_name'], 'dose': form.data['enz_dose']}
             filename = exp_data['name'] + '_results_' + secure_filename(form.file.data.filename)
             form.file.data.save('uploads/' + filename)
@@ -93,7 +95,7 @@ def create_exp():
             results_dict = {a: [','.join([str(b) for b in df[a.strip()]])][0] for a in labels}
             exp_data.update(results_dict)
             conditions_dict = {key: form.data[key] for key in form.data if key in
-                           ('temp', 'lactose', 'water', 'glucose', 'description')}
+                           ('temp', 'pH, ''lactose', 'water', 'glucose')}
             conditions = ConditionsSet.query.filter_by(**conditions_dict).first()
             if not conditions:
                 conditions = ConditionsSet(**conditions_dict)

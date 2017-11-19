@@ -42,6 +42,13 @@
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
+        </ul>
+                 {{ render_field(form.pH) }}
+            		<ul>
+            {% for error in form.pH.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
                  {{ render_field(form.lactose) }}
             		<ul>
             {% for error in form.lactose.errors %}
