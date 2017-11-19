@@ -26,8 +26,10 @@ Configure and run the API
 --------------------------
 
 
-    python run.py runserver
-
-
 API endpoints
 -------------
+
+
+Models
+------
+Explain what models attr names correspond to e.g. procedure_notes

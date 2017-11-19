@@ -25,7 +25,7 @@ class ConditionsSet(db.Model):
     lactose = db.Column(db.Float(50), nullable=False)
     water = db.Column(db.Float(50), nullable=False)
     glucose = db.Column(db.Float(50))
-    experiments = db.relationship('Experiment', backref='owner_method', lazy='dynamic')
+    experiments = db.relationship('Experiment', backref='owner_conditions', lazy='dynamic')
 
 """
   backref creates a virtual column in the class specified in the string so that by referencing e.g. experiment1.owner
@@ -46,7 +46,7 @@ class Experiment(db.Model):
     gal = db.Column(db.String(200))
     dp2split = db.Column(db.String(200))
     enzyme_id = db.Column(db.Integer, db.ForeignKey('enzyme.id'))
-    method_id = db.Column(db.Integer, db.ForeignKey('method.id'))
+    conditions_id = db.Column(db.Integer, db.ForeignKey('ConditionsSet.id'))
 
 access_password = 'mysecretkey'
 
@@ -59,7 +59,7 @@ manager = APIManager(app, flask_sqlalchemy_db=db)
 http_methods = ['GET', 'POST', 'PUT', 'DELETE']
 protected = ['POST', 'PUT_SINGLE', 'PUT MANY', 'DELETE_SINGLE', 'DELETE_MANY']
 manager.create_api(Enzyme, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
-manager.create_api(Method, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
+manager.create_api(ConditionsSet, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
 manager.create_api(Experiment, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
 
 class ExperimentForm(FlaskForm):
@@ -92,15 +92,15 @@ def create_exp():
             labels = ['hours', 'dp3plus', 'dp2', 'glu', 'gal', 'dp2split']
             results_dict = {a: [','.join([str(b) for b in df[a.strip()]])][0] for a in labels}
             exp_data.update(results_dict)
-            method_dict = {key: form.data[key] for key in form.data if key in
+            conditions_dict = {key: form.data[key] for key in form.data if key in
                            ('temp', 'lactose', 'water', 'glucose', 'description')}
-            method = Method.query.filter_by(**method_dict).first()
-            if not method:
-                method = Method(**method_dict)
+            conditions = ConditionsSet.query.filter_by(**conditions_dict).first()
+            if not conditions:
+                conditions = ConditionsSet(**conditions_dict)
             enzyme = Enzyme.query.filter_by(**enz_dict).first()
             if not enzyme:
                 enzyme = Enzyme(**enz_dict)
-            exp = Experiment(**exp_data, owner_enzyme=enzyme, owner_method=method)
+            exp = Experiment(**exp_data, owner_enzyme=enzyme, owner_conditions=conditions)
             db.session.add(exp)
             db.session.commit()
             db.session.refresh(exp)
