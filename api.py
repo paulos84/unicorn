@@ -18,13 +18,13 @@ class Enzyme(db.Model):
     dose = db.Column(db.Float(50), nullable=False)
     experiments = db.relationship('Experiment', backref='owner_enzyme', lazy='dynamic')
 
-class Method(db.Model):
+class ConditionsSet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     temp = db.Column(db.Float(50), nullable=False)
+    pH = db.Column(db.Float(10))
     lactose = db.Column(db.Float(50), nullable=False)
     water = db.Column(db.Float(50), nullable=False)
     glucose = db.Column(db.Float(50))
-    description = db.Column(db.String(500))
     experiments = db.relationship('Experiment', backref='owner_method', lazy='dynamic')
 
 """
@@ -38,6 +38,7 @@ class Experiment(db.Model):
     name = db.Column(db.String(50), nullable=False)
     date = db.Column(db.String(50), nullable=False)
     notes = db.Column(db.String(800))
+    procedure_notes = db.Column(db.String(800))
     hours = db.Column(db.String(200))
     dp3plus = db.Column(db.String(200))
     dp2 = db.Column(db.String(200))
@@ -107,9 +108,9 @@ def create_exp():
         return render_template('exp_form.html', form=form)
     return make_response('Unable to verify', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
-@app.route('/results/<exp_id>')
+@app.route('/results/<int:exp_id>')
 def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
-    exp = Experiment.query.filter_by(id=int(exp_id)).first()
+    exp = Experiment.query.filter_by(id=exp_id).first()
     chart = {"renderTo": chart_id, "type": chart_type, "height": chart_height, "width": chart_width}
     series = [{"name": 'DP2', "data": [float(a) for a in exp.dp2.split(',')]},
              {"name": 'DP3+', "data": [float(a) for a in exp.dp3plus.split(',')]}]
