@@ -116,7 +116,8 @@ def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart
     chart = {"renderTo": chart_id, "type": chart_type, "height": chart_height, "width": chart_width}
     series = [{"name": 'DP2', "data": [float(a) for a in exp.dp2.split(',')]},
              {"name": 'DP3+', "data": [float(a) for a in exp.dp3plus.split(',')]}]
-    title = {"text": 'Experiment_id: {}. Conditions:...'.format('foo')}
+    title = {"text": "{}. Conditions: Enzyme: {}, Dose: {} mg/g, Temp: {}'C".format(
+        exp.name, exp.owner_enzyme.name, exp.owner_enzyme.dose, exp.owner_conditions.temp)}
     xaxis = {"categories": exp.hours.split(',')}
     yaxis = {"title": {"text": '%'}}
     return render_template('chart.html', chartID=chart_id, chart=chart, series=series, title=title, xAxis=xaxis,
