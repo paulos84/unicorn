@@ -7,9 +7,11 @@ from wtforms.validators import InputRequired, Regexp
 from werkzeug.utils import secure_filename
 from flask_restless import APIManager, ProcessingException
 import pandas as pd
+from csv_upload import process_csv
 
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
+app.register_blueprint(process_csv)
 db = SQLAlchemy(app)
 
 
@@ -136,27 +138,6 @@ def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart
     yaxis = {"title": {"text": '%'}}
     return render_template('chart.html', chartID=chart_id, chart=chart, series=series, title=title, xAxis=xaxis,
                            yAxis=yaxis)
-
-
-# move following to a blueprint if not depend upon app or db instance
-# Function to reprocess results to account for any non-lactose starting material
-# Make so that can save the csv onto local computer
-class ConvertResultsForm(FlaskForm):
-    file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
-
-
-@app.route('/convert-results', methods=['GET', 'POST'])
-def convert_results():
-    if request.authorization and request.authorization.username == 'admin' and request.authorization.password == 'kong':
-        upload_form = ConvertResultsForm()
-        if upload_form.validate_on_submit():
-            filename = 'preprocessed_csv_' + secure_filename(upload_form.file.data.filename)
-            upload_form.file.data.save('processed_csv/' + filename)
-            df = pd.read_csv('processed_csv/{}'.format(filename))
-            df.columns = df.columns.str.strip()
-            return 'file created'
-        return render_template('convert_results.html', form=upload_form)
-    return make_response('Unable to verify', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
 if __name__ == '__main__':
