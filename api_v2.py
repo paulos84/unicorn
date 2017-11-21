@@ -30,6 +30,10 @@ class ConditionsSet(db.Model):
     glucose = db.Column(db.Float(50))
     experiments = db.relationship('Experiment', backref='owner_conditions', lazy='dynamic')
 
+    def lactose_concentration(self):
+        return self.lactose/(self.water+self.lactose) * 100
+
+
 """
   backref creates a virtual column in the class specified in the string so that by referencing e.g. experiment1.owner
   you can see who the owner is (the enzyme instance). lazy allows you to find out all the experiments that the Enzyme
@@ -61,10 +65,12 @@ def check_credentials(**kwargs):
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
 
+include_methods = ['lactose_concentration']
 http_methods = ['GET', 'POST', 'PUT', 'DELETE']
 protected = ['POST', 'PUT_SINGLE', 'PUT MANY', 'DELETE_SINGLE', 'DELETE_MANY']
 manager.create_api(Enzyme, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
-manager.create_api(ConditionsSet, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
+manager.create_api(ConditionsSet, include_methods = ['lactose_concentration'], methods=http_methods,
+                   preprocessors={a: [check_credentials] for a in protected})
 manager.create_api(Experiment, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
 
 
@@ -158,7 +164,7 @@ if __name__ == '__main__':
 
 """
     exp = Experiment.query.filter_by(id=exp_id).first()
-    lac_conc = exp.owner_conditions.lactose / exp.owner_conditions.water
+    lactose_concentration = exp.owner_conditions.lactose / exp.owner_conditions.water
     #starting percent of total solids that is glucose:
     glu_solids_pc = exp.owner_conditions.glucose / exp.owner_conditions.lactose + exp.owner_conditions.glucose
                     #except.. Error...glu_solids_pc=0
