@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, redirect, request, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
@@ -13,11 +12,13 @@ app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
 db = SQLAlchemy(app)
 
+
 class Enzyme(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     dose = db.Column(db.Float(50), nullable=False)
     experiments = db.relationship('Experiment', backref='owner_enzyme', lazy='dynamic')
+
 
 class ConditionsSet(db.Model):
     __tablename__ = 'conditions'
@@ -34,6 +35,7 @@ class ConditionsSet(db.Model):
   you can see who the owner is (the enzyme instance). lazy allows you to find out all the experiments that the Enzyme
   instance has e.g. by running the query: [i.name for i in enzyme1.experiments.all()]
 """
+
 
 class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,6 +54,7 @@ class Experiment(db.Model):
 
 access_password = 'mysecretkey'
 
+
 def check_credentials(**kwargs):
     if request.headers.get('X-Secret-Key', '') != access_password:
         raise ProcessingException(code=401)
@@ -63,6 +66,7 @@ protected = ['POST', 'PUT_SINGLE', 'PUT MANY', 'DELETE_SINGLE', 'DELETE_MANY']
 manager.create_api(Enzyme, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
 manager.create_api(ConditionsSet, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
 manager.create_api(Experiment, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
+
 
 class ExperimentForm(FlaskForm):
     name = StringField('Experiment name', default='Exp', validators=[InputRequired('Experiment name is required')])
@@ -80,6 +84,7 @@ class ExperimentForm(FlaskForm):
     glucose = FloatField('Glucose (g)', default=0)
     procedure_notes = TextAreaField('Notes on experiment procedure')
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
+
 
 @app.route('/create', methods=['GET', 'POST'])
 def create_exp():
@@ -112,6 +117,7 @@ def create_exp():
         return render_template('exp_form.html', form=form)
     return make_response('Unable to verify', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
+
 @app.route('/results/<int:exp_id>')
 def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
     exp = Experiment.query.filter_by(id=exp_id).first()
@@ -125,5 +131,36 @@ def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart
     return render_template('chart.html', chartID=chart_id, chart=chart, series=series, title=title, xAxis=xaxis,
                            yAxis=yaxis)
 
+
+class ConvertResultsForm(FlaskForm):
+    file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
+
+
+# move following to a blueprint if not depend upon app or db instance
+# Function to reprocess results to account for any non-lactose starting material
+# Make so that can save the csv onto local computer 
+@app.route('/convert-results', methods=['GET', 'POST'])
+def convert_results(exp_id):
+    if request.authorization and request.authorization.username == 'admin' and request.authorization.password == 'kong':
+        upload_form = ConvertResultsForm()
+        if upload_form.validate_on_submit():
+            filename = 'preprocessed_csv_' + secure_filename(upload_form.file.data.filename)
+            upload_form.file.data.save('processed_csv/' + filename)
+            df = pd.read_csv('processed_csv/{}'.format(filename))
+            df.columns = df.columns.str.strip()
+            labels = ['']
+            return 'file created'
+        return render_template('convert_results.html', form=upload_form)
+    return make_response('Unable to verify', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+
 if __name__ == '__main__':
     app.run(port=8080, threaded=True)
+
+"""
+    exp = Experiment.query.filter_by(id=exp_id).first()
+    lac_conc = exp.owner_conditions.lactose / exp.owner_conditions.water
+    #starting percent of total solids that is glucose:
+    glu_solids_pc = exp.owner_conditions.glucose / exp.owner_conditions.lactose + exp.owner_conditions.glucose
+                    #except.. Error...glu_solids_pc=0
+                    """
