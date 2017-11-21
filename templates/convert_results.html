@@ -1,1 +1,13 @@
-
+{% from "_render_field.html" import render_field %}
+<html>
+<head>
+<title>Convert results</title>
+</head>
+<body>
+	<form method="POST" action="{{ url_for('convert_results') }}" enctype="multipart/form-data">
+	    {{ upload_form.csrf_token }}
+        {{ render_field(upload_form.file) }}
+	    <input type="submit" value="Submit">
+	</form>
+</body>
+</html>
