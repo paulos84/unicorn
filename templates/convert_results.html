@@ -4,9 +4,21 @@
 <title>Convert results</title>
 </head>
 <body>
-	<form method="POST" action="{{ url_for('convert_results') }}" enctype="multipart/form-data">
-	    {{ upload_form.csrf_token }}
-        {{ render_field(upload_form.file) }}
+	<form method="POST" action="{{url_for('convert_results') }}" enctype="multipart/form-data">
+	    {{ form.csrf_token }}
+		{{ render_field(form.lactose) }}
+		<ul>
+            {% for error in form.lactose.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+		{{ render_field(form.glucose) }}
+		<ul>
+            {% for error in form.glucose.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {{ render_field(form.file) }}
 	    <input type="submit" value="Submit">
 	</form>
 </body>
