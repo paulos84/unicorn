@@ -4,7 +4,8 @@
 <title>Convert results</title>
 </head>
 <body>
-	<form method="POST" action="{{url_for('hourly.convert_results') }}" enctype="multipart/form-data">
+<br>
+	<form method="POST" action="{{url_for('process_csv.convert_results') }}" enctype="multipart/form-data">
 	    {{ form.csrf_token }}
 		{{ render_field(form.lactose) }}
 		<ul>
@@ -24,8 +25,102 @@
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
-       	 	{{ render_field(form.file) }}
+        {{ render_field(form.file) }}
 	    <input type="submit" value="Submit">
 	</form>
+<br>
+<p>Example format of an acceptable csv file:</p>
+<table class="table table-bordered table-hover table-condensed">
+<tbody><tr>
+	<td> </td>
+	<td align="right">1</td>
+	<td align="right">2</td>
+	<td align="right">3</td>
+	<td align="right">4</td>
+	<td align="right">5</td>
+	<td align="right">6</td>
+	<td align="right">7</td>
+	</tr>
+	<tr>
+	<td>DP7</td>
+	<td align="right">0</td>
+	<td align="right">0</td>
+	<td align="right">0</td>
+	<td align="right">8.37718E-05</td>
+	<td align="right">0.000118453</td>
+	<td align="right">0.000154988</td>
+	<td align="right">0.000280358</td>
+	</tr>
+	<tr>
+	<td>DP6</td>
+	<td align="right">0</td>
+	<td align="right">0.000295459</td>
+	<td align="right">0.000556775</td>
+	<td align="right">0.001074633</td>
+	<td align="right">0.00145503</td>
+	<td align="right">0.001698626</td>
+	<td align="right">0.002864856</td>
+	</tr>
+	<tr>
+	<td>DP5</td>
+	<td align="right">0.001372291</td>
+	<td align="right">0.004067746</td>
+	<td align="right">0.006343709</td>
+	<td align="right">0.010232638</td>
+	<td align="right">0.012168481</td>
+	<td align="right">0.013993685</td>
+	<td align="right">0.017148282</td>
+	</tr>
+	<tr>
+	<td>DP4</td>
+	<td align="right">0.014909707</td>
+	<td align="right">0.032739011</td>
+	<td align="right">0.039357337</td>
+	<td align="right">0.056198756</td>
+	<td align="right">0.061117132</td>
+	<td align="right">0.06598503</td>
+	<td align="right">0.071576289</td>
+	</tr>
+	<tr>
+	<td>DP3</td>
+	<td align="right">0.121615865</td>
+	<td align="right">0.174616007</td>
+	<td align="right">0.168326028</td>
+	<td align="right">0.210442234</td>
+	<td align="right">0.209730201</td>
+	<td align="right">0.211031691</td>
+	<td align="right">0.213009678</td>
+	</tr>
+	<tr>
+	<td>DP2</td>
+	<td align="right">0.609352091</td>
+	<td align="right">0.502508951</td>
+	<td align="right">0.515457516</td>
+	<td align="right">0.395638399</td>
+	<td align="right">0.379354553</td>
+	<td align="right">0.367425679</td>
+	<td align="right">0.362900776</td>
+	</tr>
+	<tr>
+	<td>Glucose</td>
+	<td align="right">0.233484404</td>
+	<td align="right">0.268207108</td>
+	<td align="right">0.25864824</td>
+	<td align="right">0.303265258</td>
+	<td align="right">0.314702658</td>
+	<td align="right">0.31666123</td>
+	<td align="right">0.317962303</td>
+	</tr>
+	<tr>
+	<td>Galactose</td>
+	<td align="right">0.019265641</td>
+	<td align="right">0.017565718</td>
+	<td align="right">0.011310395</td>
+	<td align="right">0.023148082</td>
+	<td align="right">0.021353492</td>
+	<td align="right">0.023204059</td>
+<td align="right">0.014257459</td>
+</tr>
+</tbody></table>
 </body>
 </html>
