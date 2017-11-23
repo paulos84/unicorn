@@ -18,19 +18,13 @@
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
-				{{ render_field(form.name) }}
+		{{ render_field(form.name) }}
 		<ul>
             {% for error in form.name.errors %}
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
-		{{ render_field(form.email) }}
-		<ul>
-            {% for error in form.email.errors %}
-            <li style="color:red;">{{ error }}</li>
-            {% endfor %}
-        </ul>
-        {{ render_field(form.file) }}
+       	 	{{ render_field(form.file) }}
 	    <input type="submit" value="Submit">
 	</form>
 </body>
