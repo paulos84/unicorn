@@ -18,6 +18,12 @@
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
+				{{ render_field(form.name) }}
+		<ul>
+            {% for error in form.name.errors %}
+            <li style="color:red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
 		{{ render_field(form.email) }}
 		<ul>
             {% for error in form.email.errors %}
