@@ -16,7 +16,6 @@ class ConvertResultsForm(FlaskForm):
     lactose = FloatField('Lactose monohydrate (g)', default=404, validators=[InputRequired('Lactose amount required')])
     glucose = FloatField('Glucose (g)', validators=[InputRequired('Water amount required')])
     name = StringField('Filename for new csv file', validators=[InputRequired('Filename required')])
-    email = StringField('Email address', validators=[InputRequired('Email address required')])
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
 
 
@@ -31,7 +30,9 @@ def convert_results():
             df = pd.read_csv('processed_csv/{}'.format(filename))
             df.iloc[6, 1:] = df.iloc[6, 1:] - added_glu
             df.iloc[:, 1:] = df.iloc[:, 1:] / df.iloc[:, 1:].sum() * 100
-            df.to_csv('{}.csv'.format(upload_form.data['name']), sep=',')
-            return 'Results csv file created to account for glucose as {}% of total solids'.format(str(added_glu*100))
+            resp = make_response(df.to_csv())
+            resp.headers["Content-Disposition"] = "attachment; filename={}.csv".format(upload_form.data['name'])
+            resp.headers["Content-Type"] = "text/csv"
+            return resp
         return render_template('convert_results.html', form=upload_form)
     return make_response('Unable to verify', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
