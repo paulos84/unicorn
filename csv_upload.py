@@ -6,7 +6,7 @@ from wtforms.validators import InputRequired
 from werkzeug.utils import secure_filename
 import pandas as pd
 
-process_csv = Blueprint('hourly', __name__)
+process_csv = Blueprint('process_csv', __name__)
 
 
 # Function to reprocess results to account for any non-lactose starting material
@@ -29,7 +29,7 @@ def convert_results():
             upload_form.file.data.save('processed_csv/' + filename)
             df = pd.read_csv('processed_csv/{}'.format(filename))
             df.iloc[6, 1:] = df.iloc[6, 1:] - added_glu
-            df.iloc[:, 1:] = df.iloc[:, 1:] / df.iloc[:, 1:].sum() * 100
+            df.iloc[:, 1:] = df.iloc[:, 1:] / df.iloc[:, 1:].sum() 
             resp = make_response(df.to_csv())
             resp.headers["Content-Disposition"] = "attachment; filename={}.csv".format(upload_form.data['name'])
             resp.headers["Content-Type"] = "text/csv"
