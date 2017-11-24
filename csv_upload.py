@@ -33,7 +33,7 @@ def convert_results():
                 s1 = df.iloc[:5].sum()
                 s1[0] = 'DP3+'
                 df = df.append(s1, ignore_index=True)
-                s2 = df.iloc[-1, 1:] + df.iloc[5, 1:] * (df.iloc[-2, 1:] / 100)
+                s2 = df.iloc[-1, 1:] + df.iloc[5, 1:] * df.iloc[-2, 1:]
                 df = df.append(s2, ignore_index=True)
                 df.iloc[-1, 0] = 'Total GOS'
                 resp = make_response(df.to_csv())
