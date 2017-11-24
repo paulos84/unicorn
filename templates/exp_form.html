@@ -42,27 +42,25 @@
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
-        </ul>
+
                  {{ render_field(form.pH) }}
             		<ul>
             {% for error in form.pH.errors %}
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
-                 {{ render_field(form.lactose) }}
+                {{ render_field(form.lactose) }}
             		<ul>
             {% for error in form.lactose.errors %}
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
-
                    {{ render_field(form.water) }}
             		<ul>
             {% for error in form.water.errors %}
             <li style="color:red;">{{ error }}</li>
             {% endfor %}
         </ul>
-         </ul>
                     {{ render_field(form.glucose) }}
             		<ul>
             {% for error in form.glucose.errors %}
@@ -78,5 +76,65 @@
                     {{ render_field(form.file) }}
 	    <input type="submit" value="Submit">
 	</form>
+    <br>
+    <h5>Example format of an acceptable csv file</h5>
+    <table class="table table-bordered table-hover table-condensed">
+    <td align="right">hours</td>
+    <td align="right">dp3plus</td>
+    <td align="right">dp2</td>
+    <td align="right">glu</td>
+    <td align="right">gal</td>
+    <td align="right">dp2split</td>
+    </tr></thead>
+    <tbody><tr>
+    <td align="right">1</td>
+    <td align="right">23.79</td>
+    <td align="right">38.34</td>
+    <td align="right">10.43</td>
+    <td align="right">1.01</td>
+    <td align="right">16.23</td>
+    </tr>
+    <tr>
+    <td align="right">2</td>
+    <td align="right">35.37</td>
+    <td align="right">32.46</td>
+    <td align="right">12.23</td>
+    <td align="right">1.21</td>
+    <td align="right">21.68</td>
+    </tr>
+    <tr>
+    <td align="right">3</td>
+    <td align="right">39.83</td>
+    <td align="right">29.56</td>
+    <td align="right">14.55</td>
+    <td align="right">1.34</td>
+    <td align="right">29.56</td>
+    </tr>
+    <tr>
+    <td align="right">4</td>
+    <td align="right">42.8</td>
+    <td align="right">26.34</td>
+    <td align="right">16.35</td>
+    <td align="right">1.42</td>
+    <td align="right">34.78</td>
+    </tr>
+    <tr>
+    <td align="right">5</td>
+    <td align="right">43.83</td>
+    <td align="right">25.78</td>
+    <td align="right">18.23</td>
+    <td align="right">1.67</td>
+    <td align="right">48.56</td>
+    </tr>
+    <tr>
+    <td align="right">6</td>
+    <td align="right">44.53</td>
+    <td align="right">24.67</td>
+    <td align="right">19.11</td>
+    <td align="right">1.58</td>
+    <td align="right">59.32</td>
+    </tr>
+    </tbody></table>
+
 </body>
 </html>
