@@ -29,7 +29,7 @@ def convert_results():
                 upload_form.file.data.save('processed_csv/' + filename)
                 df = pd.read_csv('processed_csv/{}'.format(filename))
                 df.iloc[6, 1:] = df.iloc[6, 1:] - added_glu
-                df.iloc[:, 1:] = df.iloc[:, 1:] / df.iloc[:, 1:].sum() * 100
+                df.iloc[:-1, 1:] = df.iloc[:-1, 1:] / df.iloc[:-1, 1:].sum() * 100
                 s1 = df.iloc[:5].sum()
                 s1[0] = 'DP3+'
                 df = df.append(s1, ignore_index=True)
