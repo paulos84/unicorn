@@ -16,12 +16,7 @@ Now install the required modules:
  
     $ pip install -r requirements.txt
     
-
-Create and populate database
-----------------------------
-
-
-
+    
 Configure and run the API
 --------------------------
 
