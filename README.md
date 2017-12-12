@@ -1,8 +1,8 @@
-An application created for recording and reviewing data from trials on galacto-oligosaccharide (GOS) production using various enzyme. GOS is marketed as a prebiotic food ingredient, predominantly used in infant milk formulas (further reading: http://onlinelibrary.wiley.com/doi/10.1111/j.1541-4337.2010.00119.x/full).
+An application created for recording and reviewing data from trials on galacto-oligosaccharide (GOS) production. GOS is produced from lactose using biotechnology and is marketed as a prebiotic food ingredient.
 
-It uses the Flask-Restless extension to generate a JSON API for database models defined using Flask-SQLAlchemy to allow the database to be queried as well as updated, To record data in the database, the application provides html forms for recording experiment details along with a field allowing csv files of results to be uploaded. The API allows the database to be queried and updated/edited. The API follows RESTful design principles, providing data in JSON format through endpoints detailed as follows....
+The Flask-Restless extension is used to generate a JSON API for database models defined using Flask-SQLAlchemy. Flask-WTF is used to generate html forms to enable experiment details to be recorded along with csv files of results and analytical data.
 
-...Charts
+Highcharts, a JavaScript library for Python, enables experiment results to be plotted.
 
 
 
@@ -15,7 +15,7 @@ Out[11]: 64.16772554002542
 
 
 
-default endpoint: 127.0.0.1:8080/api/experiment
+
 
 Clone this repo to your local machine. In the top level directory, create a virtual environment:
 
@@ -39,6 +39,8 @@ Configure and run the API
 
 API endpoints
 -------------
+Flask-Restless provides default endpoints for accessing data: 127.0.0.1:8080/api/{model}
+E.g. 127.0.0.1:8080/api/experiment lists details for individual experiments (dates, aims etc.) along with information stored within parent model instances (enzyme used, reaction conditions set, results)
 
 
 Models
