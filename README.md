@@ -1,21 +1,12 @@
-An application created for recording and reviewing data from trials on galacto-oligosaccharide (GOS) production. GOS is produced from lactose using biotechnology and is marketed as a prebiotic food ingredient.
+An application created for recording and reviewing data from trials on galacto-oligosaccharide (GOS) production. GOS is produced from lactose using a biotechnology process and is marketed as a prebiotic food ingredient.
 
-The Flask-Restless extension is used to generate a JSON API for database models defined using Flask-SQLAlchemy. Flask-WTF is used to generate html forms to enable experiment details to be recorded along with csv files of results and analytical data.
+The Flask-Restless extension is used to generate a JSON API for database models defined using Flask-SQLAlchemy. Flask-WTF is used to generate html forms to simplify recording of experimental details along with csv files of results and analytical data.
 
-Highcharts, a JavaScript library for Python, enables experiment results to be plotted.
-
-
-
-In[8]: e = ConditionsSet.query.first()
-In[9]: e.lactose_concentration()
-Out[9]: 64.16772554002542
-
-In[11]: q.owner_conditions.lactose_concentration()
-Out[11]: 64.16772554002542
+Highcharts, a JavaScript library for Python, enables experiment results to be plotted in order to enable comparison of various enzyme and conditions combinations.
 
 
-
-
+Install
+-------
 
 Clone this repo to your local machine. In the top level directory, create a virtual environment:
 
@@ -39,8 +30,8 @@ Configure and run the API
 
 API endpoints
 -------------
-Flask-Restless provides default endpoints for accessing data: 127.0.0.1:8080/api/{model}
-E.g. 127.0.0.1:8080/api/experiment lists details for individual experiments (dates, aims etc.) along with information stored within parent model instances (enzyme used, reaction conditions set, results)
+Flask-Restless provides default endpoints for accessing data (see https://flask-restless.readthedocs.io/en/stable/customizing.html#http-methods).
+E.g. http://<host>:<port>/api/experiment lists details for each individual experiment (date, aims etc.) along with the details stored within parent model instances (enzyme used, reaction conditions set, results).
 
 
 Models
