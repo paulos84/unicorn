@@ -5,11 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b6c75040-4cbd-47bf-b201-c1cc7d0e5300" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/processed_csv/preprocessed_csv_exp156_glu.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/processed_csv/preprocessed_csv_exp156_glu_error.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/uploads/Exp133_results_Exp133.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/uploads/Exp34_results_Exp_results_Exp133_error.csv" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
     </list>
     <ignored path="unicorn.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -51,12 +47,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="462">
-                <caret line="14" column="92" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="102" />
+              <first_editor relative-caret-position="396">
+                <caret line="12" column="8" selection-start-line="10" selection-start-column="0" selection-end-line="14" selection-end-column="102" />
                 <folding />
               </first_editor>
               <second_editor>
@@ -86,7 +82,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="_render_field.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="_render_field.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/_render_field.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
@@ -504,7 +500,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-14" y="2" width="3226" height="1712" extended-state="1" />
+    <frame x="-14" y="2" width="3226" height="1712" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24809161" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -704,19 +700,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="462">
-            <caret line="14" column="92" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="102" />
-            <folding />
-          </first_editor>
-          <second_editor>
-            <js_state />
-          </second_editor>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/processed_csv/preprocessed_csv_Exp133.csv">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -730,7 +713,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#68#0" expanded="true" />
+            <element signature="e#0#68#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -748,6 +731,19 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="396">
+            <caret line="12" column="8" selection-start-line="10" selection-start-column="0" selection-end-line="14" selection-end-column="102" />
+            <folding />
+          </first_editor>
+          <second_editor>
+            <js_state />
+          </second_editor>
         </state>
       </provider>
     </entry>

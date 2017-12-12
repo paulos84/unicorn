@@ -31,7 +31,7 @@ Configure and run the API
 API endpoints
 -------------
 Flask-Restless provides default endpoints for accessing data (see https://flask-restless.readthedocs.io/en/stable/customizing.html#http-methods).
-E.g. http://<host>:<port>/api/experiment lists details for each individual experiment (date, aims etc.) along with the details stored within parent model instances (enzyme used, reaction conditions set, results).
+E.g. http://host:port/api/experiment lists details for each individual experiment (date, aims etc.) along with the details stored within parent model instances (enzyme used, reaction conditions set, results).
 
 
 Models
