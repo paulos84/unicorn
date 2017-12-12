@@ -7,16 +7,20 @@ from wtforms.validators import InputRequired, Regexp
 from werkzeug.utils import secure_filename
 from flask_restless import APIManager, ProcessingException
 import pandas as pd
+from csv_upload import process_csv
 
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
+app.register_blueprint(process_csv)
 db = SQLAlchemy(app)
+
 
 class Enzyme(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     dose = db.Column(db.Float(50), nullable=False)
     experiments = db.relationship('Experiment', backref='owner_enzyme', lazy='dynamic')
+
 
 class ConditionsSet(db.Model):
     __tablename__ = 'conditions'
@@ -28,11 +32,16 @@ class ConditionsSet(db.Model):
     glucose = db.Column(db.Float(50))
     experiments = db.relationship('Experiment', backref='owner_conditions', lazy='dynamic')
 
+    def lactose_concentration(self):
+        return self.lactose/(self.water+self.lactose) * 100
+
+
 """
   backref creates a virtual column in the class specified in the string so that by referencing e.g. experiment1.owner
   you can see who the owner is (the enzyme instance). lazy allows you to find out all the experiments that the Enzyme
   instance has e.g. by running the query: [i.name for i in enzyme1.experiments.all()]
 """
+
 
 class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -51,17 +60,21 @@ class Experiment(db.Model):
 
 access_password = 'mysecretkey'
 
+
 def check_credentials(**kwargs):
     if request.headers.get('X-Secret-Key', '') != access_password:
         raise ProcessingException(code=401)
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
 
+include_methods = ['lactose_concentration']
 http_methods = ['GET', 'POST', 'PUT', 'DELETE']
 protected = ['POST', 'PUT_SINGLE', 'PUT MANY', 'DELETE_SINGLE', 'DELETE_MANY']
 manager.create_api(Enzyme, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
-manager.create_api(ConditionsSet, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
+manager.create_api(ConditionsSet, include_methods = ['lactose_concentration'], methods=http_methods,
+                   preprocessors={a: [check_credentials] for a in protected})
 manager.create_api(Experiment, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
+
 
 class ExperimentForm(FlaskForm):
     name = StringField('Experiment name', default='Exp', validators=[InputRequired('Experiment name is required')])
@@ -73,12 +86,13 @@ class ExperimentForm(FlaskForm):
                            validators=[InputRequired('Enzyme name required')])
     enz_dose = FloatField('Enzyme dose (mg/g)', validators=[InputRequired('Enzyme dose required')])
     temp = FloatField("Temp ('C)", validators=[InputRequired('Temperature value required')])
-    pH = FloatField('Glucose (g)', default=None)
+    pH = FloatField('pH value, if adjusted', default=None)
     lactose = FloatField('Lactose monohydrate (g)', default=404, validators=[InputRequired('Lactose amount required')])
     water = FloatField('Water (g)', default=225.6, validators=[InputRequired('Water amount required')])
     glucose = FloatField('Glucose (g)', default=0)
     procedure_notes = TextAreaField('Notes on experiment procedure')
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
+
 
 @app.route('/create', methods=['GET', 'POST'])
 def create_exp():
@@ -94,8 +108,9 @@ def create_exp():
             labels = ['hours', 'dp3plus', 'dp2', 'glu', 'gal', 'dp2split']
             results_dict = {a: [','.join([str(b) for b in df[a.strip()]])][0] for a in labels}
             exp_data.update(results_dict)
-            conditions_dict = {key: form.data[key] for key in form.data if key in
-                           ('temp', 'pH', 'lactose', 'water', 'glucose')}
+            conditions_dict = {a: form.data[a] for a in form.data if a in
+                           ('temp', 'pH', 'water', 'glucose')}
+            conditions_dict['lactose'] = form.data['lactose'] * 0.95
             conditions = ConditionsSet.query.filter_by(**conditions_dict).first()
             if not conditions:
                 conditions = ConditionsSet(**conditions_dict)
@@ -110,6 +125,7 @@ def create_exp():
         return render_template('exp_form.html', form=form)
     return make_response('Unable to verify', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
+
 @app.route('/results/<int:exp_id>')
 def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
     exp = Experiment.query.filter_by(id=exp_id).first()
@@ -122,6 +138,13 @@ def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart
     yaxis = {"title": {"text": '%'}}
     return render_template('chart.html', chartID=chart_id, chart=chart, series=series, title=title, xAxis=xaxis,
                            yAxis=yaxis)
+
+
+
+"""
+In[11]: q.owner_conditions.lactose_concentration()
+Out[11]: 64.16772554002542
+"""
 
 if __name__ == '__main__':
     app.run(port=8080, threaded=True)

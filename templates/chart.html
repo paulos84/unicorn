@@ -8,9 +8,10 @@
 		<meta charset="utf-8">
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		{% block head %}
-			<title>{% block title %} Results Chart {{ exp_id }}{% endblock %}</title>
+			<title>{% block title %} Results graph {{ exp_id }}{% endblock %}</title>
 		{% endblock %}
 	</head>
+
 	<body>
 		<div id={{ chartID|safe }} class="chart" style="height: 100px; width: 500px"></div>
 		<script>
