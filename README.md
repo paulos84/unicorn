@@ -1,6 +1,6 @@
-An application created for recording and reviewing data from trials on galacto-oligosaccharide (GOS) production. GOS is produced from lactose using a biotechnology process and is marketed as a prebiotic food ingredient.
+An application created for recording and reviewing data from trials of biotechnology-based manufacturing processes for a novel food ingredient.
 
-The Flask-Restless extension is used to generate a JSON API for database models defined using Flask-SQLAlchemy. Flask-WTF is used to generate html forms to simplify recording of experimental details along with csv files of results and analytical data.
+The Flask-Restless extension facilitates a JSON API for database models defined using Flask-SQLAlchemy. Flask-WTF is used to generate html forms to simplify recording of experimental details along with csv files of results and analytical data.
 
 Highcharts, a JavaScript library for Python, enables experiment results to be plotted in order to enable comparison of various enzyme and conditions combinations.
 
