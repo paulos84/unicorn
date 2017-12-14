@@ -50,6 +50,8 @@ After ensuring correct settings within config.py, run the server:
 
 
 **4. Submit and query data**
-The database can be updated/modified by HTTP methods as defined by individual endpoints. Entering data for the Experiment and Results
+
+The API allows database access through HTTP methods as defined by individual endpoints. Entering data for new Experiment instances should be done using the HTML form which contains a field for uploading csv files of results.
+
 Flask-Restless provides default URLs for accessing data (see https://flask-restless.readthedocs.io/en/stable/customizing.html#http-methods)
-Allowed HTTP methods depend upon the invidual endpoints.
+
