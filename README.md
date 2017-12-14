@@ -1,8 +1,10 @@
 An application created for recording and reviewing data from trials of biotechnology-based manufacturing processes for a novel food ingredient.
 
-The Flask-Restless extension facilitates a JSON API for database models defined using Flask-SQLAlchemy.
+The Flask-Restless extension facilitates a JSON API for database models defined using Flask-SQLAlchemy. Basic HTTP authentication is used for protecting access.
 
-Flask-WTF is used to generate html forms to simplify recording of experimental details along with csv files of results and analytical data.
+Flask-WTF is used to generate HTML forms to simplify recording of experiment details along with csv files of results and analytical data.
+
+Models:
 
 Highcharts, a JavaScript library for Python, enables experiment results to be plotted in order to enable comparison of various enzyme and conditions combinations.
 
@@ -10,11 +12,7 @@ Getting Started
 ---------------
 **Prerequisites**
 
-Python 3.4
-
-pip
-
-virtualenv
+Python 3.4, pip, virtualenv
 
 **1. Clone or copy repository**
 
@@ -46,14 +44,12 @@ Verify that packages have been installed:
 
 **3. Configure and run the API**
 
-After ensuring correct settings within config.py, the database can be queried and updated after running the server:
+After ensuring correct settings within config.py, run the server:
 
     $ python api.py
 
-API endpoints
---------------
-Flask-Restless provides default endpoints for accessing data (see https://flask-restless.readthedocs.io/en/stable/customizing.html#http-methods)
 
-Trial data entry form
----------------------
-
+**4. Submit and query data**
+The database can be updated/modified by HTTP methods as defined by individual endpoints. Entering data for the Experiment and Results
+Flask-Restless provides default URLs for accessing data (see https://flask-restless.readthedocs.io/en/stable/customizing.html#http-methods)
+Allowed HTTP methods depend upon the invidual endpoints.
