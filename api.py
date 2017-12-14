@@ -14,13 +14,11 @@ app.config.from_object('config.DevelopmentConfig')
 app.register_blueprint(process_csv)
 db = SQLAlchemy(app)
 
-
 class Enzyme(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     dose = db.Column(db.Float(50), nullable=False)
     experiments = db.relationship('Experiment', backref='owner_enzyme', lazy='dynamic')
-
 
 class ConditionsSet(db.Model):
     __tablename__ = 'conditions'
@@ -34,14 +32,11 @@ class ConditionsSet(db.Model):
 
     def lactose_concentration(self):
         return self.lactose/(self.water+self.lactose) * 100
-
-
 """
   backref creates a virtual column in the class specified in the string so that by referencing e.g. experiment1.owner
   you can see who the owner is (the enzyme instance). lazy allows you to find out all the experiments that the Enzyme
   instance has e.g. by running the query: [i.name for i in enzyme1.experiments.all()]
 """
-
 
 class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -60,7 +55,6 @@ class Experiment(db.Model):
 
 access_password = 'mysecretkey'
 
-
 def check_credentials(**kwargs):
     if request.headers.get('X-Secret-Key', '') != access_password:
         raise ProcessingException(code=401)
@@ -74,7 +68,6 @@ manager.create_api(Enzyme, methods=http_methods, preprocessors={a: [check_creden
 manager.create_api(ConditionsSet, include_methods = ['lactose_concentration'], methods=http_methods,
                    preprocessors={a: [check_credentials] for a in protected})
 manager.create_api(Experiment, methods=http_methods, preprocessors={a: [check_credentials] for a in protected})
-
 
 class ExperimentForm(FlaskForm):
     name = StringField('Experiment name', default='Exp', validators=[InputRequired('Experiment name is required')])
@@ -92,7 +85,6 @@ class ExperimentForm(FlaskForm):
     glucose = FloatField('Glucose (g)', default=0)
     procedure_notes = TextAreaField('Notes on experiment procedure')
     file = FileField('Results csv file', validators=[FileRequired(), FileAllowed(['csv'], 'csv files only')])
-
 
 @app.route('/create', methods=['GET', 'POST'])
 def create_exp():
@@ -125,7 +117,6 @@ def create_exp():
         return render_template('exp_form.html', form=form)
     return make_response('Unable to verify', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
-
 @app.route('/results/<int:exp_id>')
 def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart_width=800):
     exp = Experiment.query.filter_by(id=exp_id).first()
@@ -138,13 +129,6 @@ def plot(exp_id, chart_id='chart_ID', chart_type='line', chart_height=550, chart
     yaxis = {"title": {"text": '%'}}
     return render_template('chart.html', chartID=chart_id, chart=chart, series=series, title=title, xAxis=xaxis,
                            yAxis=yaxis)
-
-
-
-"""
-In[11]: q.owner_conditions.lactose_concentration()
-Out[11]: 64.16772554002542
-"""
 
 if __name__ == '__main__':
     app.run(port=8080, threaded=True)
