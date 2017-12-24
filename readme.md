@@ -1,12 +1,6 @@
-An application created for recording and reviewing data from trials of biotechnology-based manufacturing processes for a novel food ingredient.
+An API for managing data from in-house trials of an enzyme-based process utilizing lactose to manufacture an ingredient in infant milk formula called galacto-oligosaccharides (GOS).
 
-The Flask-Restless extension facilitates a JSON API for database models defined using Flask-SQLAlchemy. Basic HTTP authentication is used for protecting access.
-
-Flask-WTF is used to generate HTML forms to simplify recording of experiment details along with csv files of results and analytical data.
-
-Models:
-
-Highcharts, a JavaScript library for Python, enables experiment results to be plotted in order to enable comparison of various enzyme and conditions combinations.
+It is built using the Flask-Restless framework and SQL-Alchemy. Flask-WTF is used to generate HTML forms to simplify recording of experiment details along with csv files of results and analytical data. Basic HTTP authentication is used for protecting access.
 
 Getting Started
 ---------------
